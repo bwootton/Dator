@@ -1,0 +1,22 @@
+<div ng-controller="MainControl">
+    <div class="col-sm-11">
+        <div class="panel-default">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    Programs
+                </div>
+                <div class="panel-body">
+                    <ul>
+                        <li ng-repeat="program in programs"><a href="/#/editor/{{ program.id }}">{{ program.name }}</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        apple_vav_co_zs
+        8187035547 steve bobrick
+        <div class="panel-default">
+            <button class="btn btn-default" ng-click="newProgram()">New Program</button>
+        </div>
+    </div>
+</div>
