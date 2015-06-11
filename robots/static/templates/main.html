@@ -16,7 +16,8 @@
                         </thead>
                         <tbody>
                         <tr ng-repeat="localComputer in localComputers">
-                            <td><a href="/ruenoor/#/local_computer/{{ local_computer.id }}">{{ localComputer.name }}</a>
+                            <td>
+                                <a href="/ruenoor/#/local_computer/{{ local_computer.id }}">{{ localComputer.name }}</a>
                             </td>
                             <td>{{ localComputer.uuid }}</td>
                             <td>

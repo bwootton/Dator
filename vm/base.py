@@ -28,6 +28,9 @@ class Configurator(object):
     def get_config(self):
         return self.config
 
+    def set_config(self, config):
+        self.config = config
+
 
 class DataConnection(object):
 
@@ -40,19 +43,16 @@ class DataConnection(object):
         """
         if registration_token:
             self.configurator.get_config()["registration_token"] = registration_token
-            if file_name:
-                self.configurator.write_config(file_name)
 
         url = self.configurator.get_config()['server'] + "/api/v1/local_computer/?format=json"
         headers = {'content-type': 'application/json'}
         response = requests.post(url, data=json.dumps(self.configurator.get_config()), headers=headers)
-
-        print response
-
+        new_config = json.loads(response.content)
+        self.configurator.set_config(new_config)
 
 
 
 config = Configurator()
 config.write_config("default.cfg")
 data_connection = DataConnection(config)
-data_connection.register()
+data_connection.register("my reg token", "default.cfg")
