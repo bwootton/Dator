@@ -5,7 +5,6 @@ function robotControl($scope, $routeParams, Restangular) {
     $scope.aceLoaded = function (_editor) {
         $scope.editor = _editor;
         _editor.setReadOnly(false);
-        console.log("getting program id " + $routeParams.id);
         Restangular.one("program", $routeParams.id).get().then(function (program) {
             $scope.program = program;
             $scope.editor.getSession().setValue($scope.program.code);

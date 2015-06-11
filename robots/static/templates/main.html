@@ -3,29 +3,34 @@
         <div class="panel-default">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <div class="panel-title">Systems</div>
+                    <div class="panel-title">Local Computers</div>
                 </div>
                 <div class="panel-body">
                     <table class="table">
                         <thead>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Controllers</th>
-                        <th>Delete</th>
+                        <tr>
+                            <th>Name</th>
+                            <th>UUID</th>
+                            <th>Delete</th>
+                        </tr>
                         </thead>
                         <tbody>
-                        <tr ng-repeat="system in systems">
-                            <td><a href="/ruenoor/#/editor/{{ program.id }}">{{ program.name }}</a></td>
-                            <td>{{ program.description }}</td>
-                            <td><button class="pull-right" ng-click="deleteProgram(program.id)"><b>x</b></button></td>
+                        <tr ng-repeat="localComputer in localComputers">
+                            <td><a href="/ruenoor/#/local_computer/{{ local_computer.id }}">{{ localComputer.name }}</a>
+                            </td>
+                            <td>{{ localComputer.uuid }}</td>
+                            <td>
+                                <button class="pull-right" ng-click="deleteComputer(localComputer.id)"><b>x</b></button>
+                            </td>
                         </tr>
+
                         </tbody>
                     </table>
                 </div>
 
                 <div class="panel-default">
                     <div class="panel-body">
-                        <button class="btn btn-default" ng-click="newProgram()">New Program</button>
+                        <button class="btn btn-default" ng-click="claimComputer()">Claim Computer</button>
                     </div>
                 </div>
             </div>
@@ -38,15 +43,19 @@
                 <div class="panel-body">
                     <table class="table">
                         <thead>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Delete</th>
+                        <tr>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th>Delete</th>
+                        </tr>
                         </thead>
                         <tbody>
                         <tr ng-repeat="program in programs">
                             <td><a href="/ruenoor/#/editor/{{ program.id }}">{{ program.name }}</a></td>
                             <td>{{ program.description }}</td>
-                            <td><button class="pull-right" ng-click="deleteProgram(program.id)"><b>x</b></button></td>
+                            <td>
+                                <button class="pull-right" ng-click="deleteProgram(program.id)"><b>x</b></button>
+                            </td>
                         </tr>
                         </tbody>
                     </table>

@@ -4,6 +4,8 @@ var app = angular.module('Ruenoor', ['restangular', 'ngRoute', 'ui.ace'])
         // set routes
         $routeProvider.when('/editor/:id', {
             templateUrl: '/static/templates/editor.html'
+        }).when('/local_computer/:id', {
+            templateUrl: '/static/templates/local_computer.html'
         }).when('/', {
             templateUrl: '/static/templates/main.html'
         });

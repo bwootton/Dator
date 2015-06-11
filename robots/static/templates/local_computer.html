@@ -1,0 +1,22 @@
+<div ng-controller="LocalComputer">
+    <H1>Local Computer</H1>
+
+    <div class="col-sm-11">
+        <div class="row">
+            <div class="panel" style="margin-bottom: 40px;">
+                <div class="col-sm-3">
+                    <label>Name</label><input type="form-control" type="text" ng-model="localComputer.name">
+                </div>
+                <div class="col-sm-9">
+                    <label>Description</label><input type="form-control" type="text" ng-model="localComputer.uuid">
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-sm-11">
+        <button class="btn btn-default" ng-click="saveComputer()">Save</button>
+        <button class="btn btn-default" ng-click="loadComputer()">Refresh</button>
+        <a class="btn btn-default" href="/ruenoor/#/">Main Page</a>
+    </div>
+</div>
