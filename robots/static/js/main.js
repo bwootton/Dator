@@ -15,6 +15,19 @@ function MainControl($scope, Restangular){
             $scope.getPrograms();
         });
     };
+
+    $scope.deleteProgram = function(programId){
+        var program = _.find($scope.programs, function(program){
+            return program.id == programId;
+        });
+        return Restangular.one("program", program.id).get().then(function(foundProgram){
+            foundProgram.remove().then(
+                function(removeStatus){
+                    $scope.getPrograms();
+                });
+        });
+    };
+
     $scope.getPrograms();
 
 

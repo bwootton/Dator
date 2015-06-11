@@ -31,6 +31,6 @@ v1_api.register(ProgramResource())
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(v1_api.urls)),
-    url(r'^simple_view/', simple_view, name='SimpleURL'),
+    url(r'^ruenoor/', simple_view, name='SimpleURL'),
     url(r'^$', root_view, name='RootView')
 ]

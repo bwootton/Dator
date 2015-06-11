@@ -1,22 +1,64 @@
 <div ng-controller="MainControl">
-    <div class="col-sm-11">
+    <div class="col-sm-11" style="margin-top: 30px;">
         <div class="panel-default">
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    Programs
+                    <div class="panel-title">Systems</div>
                 </div>
                 <div class="panel-body">
-                    <ul>
-                        <li ng-repeat="program in programs"><a href="/#/editor/{{ program.id }}">{{ program.name }}</a>
-                        </li>
-                    </ul>
+                    <table class="table">
+                        <thead>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Controllers</th>
+                        <th>Delete</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="system in systems">
+                            <td><a href="/ruenoor/#/editor/{{ program.id }}">{{ program.name }}</a></td>
+                            <td>{{ program.description }}</td>
+                            <td><button class="pull-right" ng-click="deleteProgram(program.id)"><b>x</b></button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel-default">
+                    <div class="panel-body">
+                        <button class="btn btn-default" ng-click="newProgram()">New Program</button>
+                    </div>
                 </div>
             </div>
         </div>
-        apple_vav_co_zs
-        8187035547 steve bobrick
         <div class="panel-default">
-            <button class="btn btn-default" ng-click="newProgram()">New Program</button>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Programs</div>
+                </div>
+                <div class="panel-body">
+                    <table class="table">
+                        <thead>
+                        <th>Name</th>
+                        <th>Description</th>
+                        <th>Delete</th>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="program in programs">
+                            <td><a href="/ruenoor/#/editor/{{ program.id }}">{{ program.name }}</a></td>
+                            <td>{{ program.description }}</td>
+                            <td><button class="pull-right" ng-click="deleteProgram(program.id)"><b>x</b></button></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel-default">
+                    <div class="panel-body">
+                        <button class="btn btn-default" ng-click="newProgram()">New Program</button>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </div>
 </div>

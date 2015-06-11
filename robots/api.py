@@ -4,7 +4,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from robots.models import System, Program, Command, Controller
+from robots.models import System, Program, Command, LocalComputer
 
 
 class SystemResource(ModelResource):
@@ -36,10 +36,10 @@ class CommandResource(ModelResource):
         resource_name = 'command'
         always_return_data = True
 
-class ControllerResource(ModelResource):
+class LocalComputerResource(ModelResource):
 
     class Meta:
-        queryset = Controller.objects.all()
+        queryset = LocalComputer.objects.all()
         authorization = Authorization()
         authentication = Authentication()
         resource_name = 'controller'

@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-
+import pandas as pd
 
 class SystemModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -24,13 +24,16 @@ class System(SystemModel):
 class Shift(SystemModel):
     name = models.CharField(max_length=128)
 
-class Controller(SystemModel):
+
+class LocalComputer(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
     system = models.ForeignKey('System')
 
+
 class Command(SystemModel):
-    controller = models.ForeignKey('Controller')
+    controller = models.ForeignKey('LocalComputer')
+
 
 class Program(SystemModel):
     group = models.ManyToManyField(Group)
@@ -42,7 +45,7 @@ class Program(SystemModel):
 class Map(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
-    controller = models.ForeignKey('Controller')
+    controller = models.ForeignKey('LocalComputer')
 
 ACTUATOR = 1
 SENSOR = 2
@@ -53,7 +56,7 @@ class MapPoint(SystemModel):
     point_type = models.IntegerField(default=SENSOR)
     name = models.CharField(max_length=128)
     path = models.CharField(max_length=128)
-    controller = models.ForeignKey('Controller')
+    controller = models.ForeignKey('LocalComputer')
 
 
 class Signal(SystemModel):
@@ -61,18 +64,19 @@ class Signal(SystemModel):
     name = models.CharField(max_length=128)
 
 
+
 class SignalBlob(SystemModel):
     signal = models.ForeignKey('Signal')
 
-@receiver(post_save, sender=Command)
-@receiver(post_save, sender=Controller)
-@receiver(post_save, sender=Map)
-@receiver(post_save, sender=MapPoint)
-@receiver(post_save, sender=Program)
-@receiver(post_save, sender=Shift)
-@receiver(post_save, sender=Signal)
-@receiver(post_save, sender=SignalBlob)
-@receiver(post_save, sender=System)
-def set_uuid(sender, instance, created, **kwargs):
-    if created:
+@receiver(pre_save, sender=Command)
+@receiver(pre_save, sender=LocalComputer)
+@receiver(pre_save, sender=Map)
+@receiver(pre_save, sender=MapPoint)
+@receiver(pre_save, sender=Program)
+@receiver(pre_save, sender=Shift)
+@receiver(pre_save, sender=Signal)
+@receiver(pre_save, sender=SignalBlob)
+@receiver(pre_save, sender=System)
+def set_uuid(sender, instance, **kwargs):
+    if not instance.uuid:
         instance.uuid = str(uuid4())

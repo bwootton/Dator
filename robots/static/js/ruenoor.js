@@ -29,8 +29,8 @@ var app = angular.module('Ruenoor', ['restangular', 'ngRoute', 'ui.ace'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     });
 
-app.config(['$httpProvider', function ($httpProvider) {
-    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
-    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
-}]);
+//app.config(['$httpProvider', function ($httpProvider) {
+//    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
+//    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
+//}]);
 

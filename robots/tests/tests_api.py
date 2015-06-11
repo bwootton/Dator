@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
-from robots.models import System, Program
+from robots.models import System, Program, SystemModel, Map
 import json
+
 
 class TestAPI(TestCase):
 
@@ -23,3 +24,5 @@ class TestAPI(TestCase):
         data = json.loads(response.content)["objects"]
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "a program")
+
+
