@@ -84,14 +84,6 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': db_name,
-
-        # 'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': 'robots',
-        # 'USER': 'root',
-        # 'PASSWORD': 'BrightBox1234',
-        # 'HOST': '', # Empty for localhost through domain sockets or '127.0.0.1' for localhost through TCP.
-        # 'PORT': '', # Set to empty string for default.
-        #'OPTIONS': {"init_command": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED", }
     }
 }
 

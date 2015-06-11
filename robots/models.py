@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
-import pandas as pd
+
 
 class SystemModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -28,7 +28,9 @@ class Shift(SystemModel):
 class LocalComputer(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
-    system = models.ForeignKey('System')
+    registration_token = models.CharField(max_length=128)
+    #secret_uuid = models.CharField(max_length=128)
+    system = models.ForeignKey('System', null=True)
 
 
 class Command(SystemModel):

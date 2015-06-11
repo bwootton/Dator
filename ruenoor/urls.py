@@ -27,6 +27,7 @@ v1_api = Api(api_name='v1')
 # equipment resources
 v1_api.register(SystemResource())
 v1_api.register(ProgramResource())
+v1_api.register(LocalComputerResource())
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),

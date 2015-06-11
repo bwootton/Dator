@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from robots.models import System, Program, SystemModel, Map
+from robots.models import System, Program, SystemModel, Map, LocalComputer
 import json
 
 
@@ -25,4 +25,10 @@ class TestAPI(TestCase):
         self.assertEqual(len(data), 1)
         self.assertEqual(data[0]["name"], "a program")
 
-
+    def test_post_local_computer(self):
+        response = self.client.post("/api/v1/local_computer/?format=json",
+                                    data=json.dumps({'name':"a_name",
+                                                     'registration_token':'a_token'}),
+                                    content_type= "application/json"
+                                    )
+        lc = LocalComputer.objects.get(name='a_name')

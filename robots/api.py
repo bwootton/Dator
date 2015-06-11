@@ -42,7 +42,7 @@ class LocalComputerResource(ModelResource):
         queryset = LocalComputer.objects.all()
         authorization = Authorization()
         authentication = Authentication()
-        resource_name = 'controller'
+        resource_name = 'local_computer'
         always_return_data = True
 
 
