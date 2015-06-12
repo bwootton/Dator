@@ -33,8 +33,10 @@ class LocalComputer(SystemModel):
 
 
 class Command(SystemModel):
-    controller = models.ForeignKey('LocalComputer')
-
+    local_computer = models.ForeignKey('LocalComputer')
+    command_type = models.IntegerField()
+    json_command = models.CharField(max_length="512")
+    is_executed = models.BooleanField(default=False)
 
 class Program(SystemModel):
     group = models.ManyToManyField(Group)

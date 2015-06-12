@@ -1,0 +1,9 @@
+1. Shifts have programs
+2. vm downloads programs for shift and runs the programs.
+3. vm downloads shift start/shift end
+4. vm downloads shift end
+5. user defines programs for a shift
+6. user defines maps and map points
+7. user access maps from programs
+8. user uploads map point values to system
+9. user views/downloads map values.
