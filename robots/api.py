@@ -28,6 +28,8 @@ class ProgramResource(ModelResource):
 
 
 class CommandResource(ModelResource):
+    local_computer_id = IntegerField(attribute="local_computer_id")
+    is_executed = BooleanField(attribute="is_executed")
 
     class Meta:
         queryset = Command.objects.all()
@@ -35,6 +37,10 @@ class CommandResource(ModelResource):
         authentication = Authentication()
         resource_name = 'command'
         always_return_data = True
+        filtering = {
+            'local_computer_id': ALL_WITH_RELATIONS
+        }
+        
 
 class LocalComputerResource(ModelResource):
 

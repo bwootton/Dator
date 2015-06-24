@@ -50,9 +50,15 @@ class DataConnection(object):
         new_config = json.loads(response.content)
         self.configurator.set_config(new_config)
 
+    def get_commands(self):
+        id = self.configurator.get_config()["id"]
+        secret = self.configurator.get_config["secret_uuid"]
+        url = self.configurator.get_config()['server']+ "/api/v1/command/?format=json&"
+
 
 
 config = Configurator()
 config.write_config("default.cfg")
 data_connection = DataConnection(config)
 data_connection.register("my reg token", "default.cfg")
+config.write_config("default.cfg")

@@ -32,10 +32,12 @@ class LocalComputer(SystemModel):
     system = models.ForeignKey('System', null=True)
 
 
+COMMAND_NOOP=0
+
 class Command(SystemModel):
     local_computer = models.ForeignKey('LocalComputer')
-    command_type = models.IntegerField()
-    json_command = models.CharField(max_length="512")
+    command_type = models.IntegerField(default=COMMAND_NOOP)
+    json_command = models.CharField(max_length="512", null=True)
     is_executed = models.BooleanField(default=False)
 
 class Program(SystemModel):
