@@ -4,6 +4,7 @@ from django.contrib.auth.models import Group
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
+
 class SystemModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
