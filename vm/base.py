@@ -4,7 +4,7 @@ from uuid import uuid4
 import requests
 
 
-class Configuration(object):
+class Configurator(object):
     """
     Manages a config for the Local Computer
     """
@@ -36,38 +36,47 @@ class Configuration(object):
 
 
 class DataConnection(object):
-    def __init__(self, configuration):
-        self.configuration = configuration
+    def __init__(self, configurator):
+        self.configurator = configurator
 
     def register(self, registration_token=None, file_name=None):
         """
         Call to register a new local computer.
         """
-        config = self.configuration.get_config()
+        config = self.configurator.get_config()
         if registration_token:
             config["registration_token"] = registration_token
-        config["secret_uuid"] = str(uuid4())\
+        config["secret_uuid"] = str(uuid4())
 
         url = config['server'] + "/api/v1/local_computer/?format=json"
         headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(self.configuration.get_config()), headers=headers)
+        response = requests.post(url, data=json.dumps(self.configurator.get_config()), headers=headers)
         new_config = json.loads(response.content)
-        self.configuration.set_config(new_config)
+        self.configurator.set_config(new_config)
 
     def update_config(self):
         """
         Update local config with global config.
         """
-        config = self.configuration.get_config()
+        config = self.configurator.get_config()
         url = config['server'] + "/api/v1/local_computer/{}/?format=json".format(config['id'])
-
-
+        response = requests.get(url, headers={'content-type': 'application/json', 'auth_key': config['secret_uuid']})
+        if 200 <= response.status_code < 300:
+            updated_config = json.loads(response.content)
+            for key in updated_config.keys():
+                config[key] = updated_config[key]
+            self.configurator.write_config(CONFIG_LOCATION)
+        else:
+            print "WARNING Config Lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
+            if response.content:
+                print response.content
+            return []
 
     def get_new_commands(self):
         """
         :return: Commnds from the server to be executed
         """
-        config = self.configuration.get_config()
+        config = self.configurator.get_config()
         id = config["id"]
         secret_uuid = config["secret_uuid"]
         url = "{}/api/v1/command/?format=json&is_local_computer_id={}&is_executed=false".format(config['server'], id)
@@ -84,25 +93,25 @@ class DataConnection(object):
 CONFIG_LOCATION = "default.cfg"
 
 
-def init_config():
+def init_configurator():
     """
     Register local computer if not done previously.
-    :return: The configuration for this local computer
+    :return: The configurator for this local computer
     """
     if os.path.isfile(CONFIG_LOCATION):
-        configuration = Configuration(filename=CONFIG_LOCATION)
-        print "Found local configuration at {}".format(CONFIG_LOCATION)
+        configurator = Configurator(filename=CONFIG_LOCATION)
+        print "Found local configurator at {}".format(CONFIG_LOCATION)
     else:
-        configuration = Configuration()
-        configuration.write_config(CONFIG_LOCATION)
+        configurator = Configurator()
+        configurator.write_config(CONFIG_LOCATION)
 
-        data_connection = DataConnection(configuration)
+        data_connection = DataConnection(configurator)
         my_reg_token = str(uuid4())
-        print "Registering to {} with token {}".format(configuration.get_config()['server'], my_reg_token)
+        print "Registering to {} with token {}".format(configurator.get_config()['server'], my_reg_token)
         data_connection.register(my_reg_token, CONFIG_LOCATION)
-        configuration.write_config(CONFIG_LOCATION)
+        configurator.write_config(CONFIG_LOCATION)
 
-    return configuration
+    return configurator
 
 
 class WorkerPool(object):
@@ -123,14 +132,15 @@ if __name__ == '__main__':
     """
     Main loop.  Handle commands until done.
     """
-    config = init_config()
-    data_connection = DataConnection(config)
+    configurator = init_configurator()
+    data_connection = DataConnection(configurator)
+    data_connection.update_config()
+    worker_pool = WorkerPool(configurator)
+
     done = False
-    worker_pool = WorkerPool(config)
     while not done:
         commands = data_connection.get_new_commands()
         done = handle_commands(commands, worker_pool)
-
 
     worker_pool.stop()
     print("Received done command.  Shutting down.")
