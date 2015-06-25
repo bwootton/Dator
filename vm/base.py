@@ -89,8 +89,14 @@ def init_config():
     return configuration
 
 
-def create_workers(config):
-    pass
+class WorkerPool(object):
+
+    def __init__(self, config):
+        pass
+
+    addProgram
+
+
 
 
 def handle_commands(config):
@@ -104,12 +110,14 @@ if __name__ == '__main__':
     config = init_config()
     data_connection = DataConnection(config)
     done = False
-    create_workers(config)
+    worker_pool = WorkerPool(config)
+    worker_pool.start()
     while not done:
-        # check for new commands every 10 seconds
         commands = data_connection.get_new_commands()
-        done = handle_commands(commands)
+        done = handle_commands(commands, worker_pool)
 
+
+    worker_pool.stop()
     print("Received done command.  Shutting down.")
 
 

@@ -29,8 +29,9 @@ class LocalComputer(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
     registration_token = models.CharField(max_length=128)
-    #secret_uuid = models.CharField(max_length=128)
+    secret_uuid = models.CharField(max_length=128)
     system = models.ForeignKey('System', null=True)
+    command_refresh_sec = models.IntegerField(default=10)
 
 
 COMMAND_NOOP=0
