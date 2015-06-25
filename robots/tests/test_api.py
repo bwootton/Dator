@@ -2,7 +2,6 @@ from django.test import TestCase, Client
 from robots.models import System, Program, SystemModel, Map, LocalComputer, Command
 import json
 
-
 class TestAPI(TestCase):
 
     def setUp(self):
@@ -44,5 +43,16 @@ class TestAPI(TestCase):
         self.assertEquals(r_data[0]['id'], local_computer.id)
 
         response = self.client.get("/api/v1/command/?format=json&local_computer_id={}".format(local_computer.id+1))
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(len(r_data), 0 )
+
+    def test_filter_commands_by_is_executed(self):
+        local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
+        command = Command.objects.create(local_computer=local_computer, is_executed=False)
+        response = self.client.get("/api/v1/command/?format=json&local_computer_id={}&is_executed=false".format(local_computer.id))
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], local_computer.id)
+
+        response = self.client.get("/api/v1/command/?format=json&local_computer_id={}&is_executed=true".format(local_computer.id))
         r_data = json.loads(response.content)['objects']
         self.assertEquals(len(r_data), 0 )

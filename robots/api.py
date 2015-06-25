@@ -38,7 +38,8 @@ class CommandResource(ModelResource):
         resource_name = 'command'
         always_return_data = True
         filtering = {
-            'local_computer_id': ALL_WITH_RELATIONS
+            'local_computer_id': ALL_WITH_RELATIONS,
+            'is_executed': ALL_WITH_RELATIONS
         }
         
 
