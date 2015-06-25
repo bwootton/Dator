@@ -1,7 +1,9 @@
 import json
 import os
 from uuid import uuid4
+import multiprocessing
 import requests
+import time
 
 
 class Configurator(object):
@@ -74,7 +76,7 @@ class DataConnection(object):
 
     def get_new_commands(self):
         """
-        :return: Commnds from the server to be executed
+        :return: Commands from the server for this local computer that should be executed.
         """
         config = self.configurator.get_config()
         id = config["id"]
@@ -114,14 +116,38 @@ def init_configurator():
     return configurator
 
 
+
+def periodic_eval(refresh_time_sec, program, should_stop, shared_val):
+    while not should_stop.value:
+        shared_val.value += 1
+        eval(compile(program, '<string>', 'exec'))
+
+        time.sleep(refresh_time_sec)
+
+    return periodic_eval
+
+
 class WorkerPool(object):
 
-    def __init__(self, config):
-        pass
+    def __init__(self):
+        self.job_list = {}
+        self.shared_val = multiprocessing.Value('i',0)
 
+
+    def start_program(self, program_id, refresh_time_sec, program):
+        if program_id not in self.job_list.keys():
+            should_stop = multiprocessing.Value('b', False)
+            self.job_list[program_id] = [should_stop, multiprocessing.Process(target=periodic_eval, args=(refresh_time_sec, program, should_stop, self.shared_val))]
+            self.job_list[program_id][1].start()
+
+    def stop_program(self, program_id):
+        self.job_list[program_id][0].value = True
+        self.job_list[program_id][1].join(20)
+        print "Stopped program id {}".format(program_id)
 
     def stop(self):
-        pass
+        for program_id in self.job_list.keys():
+            self.stop_program(program_id)
 
 
 def handle_commands(config, worker_pool):
@@ -135,14 +161,19 @@ if __name__ == '__main__':
     configurator = init_configurator()
     data_connection = DataConnection(configurator)
     data_connection.update_config()
-    worker_pool = WorkerPool(configurator)
+    worker_pool = WorkerPool()
 
     done = False
-    while not done:
+    worker_pool.start_program(1, 1, "print('hello world')")
+
+    for i in range(1):
         commands = data_connection.get_new_commands()
         done = handle_commands(commands, worker_pool)
+        time.sleep(configurator.get_config()['command_refresh_sec'])
 
     worker_pool.stop()
+    print("got shared_value {}".format(worker_pool.shared_val.value))
+
     print("Received done command.  Shutting down.")
 
 
