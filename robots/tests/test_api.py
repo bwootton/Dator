@@ -28,10 +28,13 @@ class TestAPI(TestCase):
     def test_post_local_computer(self):
         response = self.client.post("/api/v1/local_computer/?format=json",
                                     data=json.dumps({'name':"a_name",
-                                                     'registration_token':'a_token'}),
+                                                     'registration_token':'a_token',
+                                                     'secret_uuid': 'a_uuid'}),
                                     content_type= "application/json"
                                     )
         lc = LocalComputer.objects.get(name='a_name')
+        self.assertIsNotNone(lc)
+        self.assertEqual(lc.secret_uuid, 'a_uuid')
 
     def test_filter_commands_by_local_computer(self):
         local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')

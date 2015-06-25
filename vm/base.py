@@ -43,8 +43,10 @@ class DataConnection(object):
         """
         Call to register a new local computer.
         """
+        configuration = self.configuration.get_config()
         if registration_token:
-            self.configuration.get_config()["registration_token"] = registration_token
+            configuration["registration_token"] = registration_token
+        configuration["secret_uuid"] = str(uuid4())
 
         url = self.configuration.get_config()['server'] + "/api/v1/local_computer/?format=json"
         headers = {'content-type': 'application/json'}
