@@ -1,21 +1,58 @@
 <div ng-controller="LocalComputer">
-    <H1>Local Computer</H1>
-
-    <div class="col-sm-11">
-        <div class="row">
-            <div class="panel" style="margin-bottom: 40px;">
-                <div class="col-sm-3">
-                    <label>Name</label><input type="form-control" type="text" ng-model="localComputer.name">
+    <div class="container" style="margin-top: 15px;">
+        <div class="col-sm-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">
+                        Local Computer
+                        <small>{{ localComputer.name }}</small>
+                    </div>
                 </div>
-                <div class="col-sm-9">
-                    <label>UUID</label><input type="form-control" type="text" ng-model="localComputer.uuid">
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Name</label>
+
+                            <div class="col-sm-10">
+                                <input class="form-control" type="text" ng-model="localComputer.name">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">UUID</label>
+
+                            <div class="col-sm-10">
+                                <input class="form-control" type="text" ng-model="localComputer.uuid">
+                            </div>
+                        </div>
+                        <button class="btn btn-success" ng-click="saveComputer()">Save</button>
+                        <button class="btn btn-warning" ng-click="stopComputer()">Stop Programs</button>
+                        <a class="btn btn-primary   " href="/ruenoor/#/">Main Page</a>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Programs</div>
+                </div>
+                <div class="panel-body">
+                    <table class="table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="program in programs">
+                                <td>{{ program.name }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
-    <div class="col-sm-11">
-        <button class="btn btn-default" ng-click="saveComputer()">Save</button>
-        <button class="btn btn-default" ng-click="loadComputer()">Refresh</button>
-        <a class="btn btn-default" href="/ruenoor/#/">Main Page</a>
-    </div>
+
 </div>

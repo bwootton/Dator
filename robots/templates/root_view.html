@@ -4,8 +4,11 @@
 
 </head>
 <body>
-<H1>Welcome to Ruenoor!</H1>
+<H1 class="text-center">Welcome to Ruenoor!</H1>
 
-<a href="/ruenoor">Enter</a>
+<p class="text-center"><a class='btn btn-danger' href="/ruenoor">Enter</a></p>
 </body>
+{% load static %}
+<link href='{% static 'bower_components/bootstrap/dist/css/bootstrap.min.css' %}' rel="stylesheet" type="text/css"/>
+<link href='{% static 'css/bootstrap.min.css' %}' rel="stylesheet" type="text/css"/>
 </html>

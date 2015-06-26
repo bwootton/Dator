@@ -17,7 +17,34 @@ function LocalComputer($scope, $routeParams,Restangular){
         });
     };
 
+    $scope.loadPrograms = function(){
+        return Restangular.all("program").getList().then(function(programs){
+            $scope.programs = programs;
+        }, function(reason){
+            alert("Couldn't load programs: " + reason)
+        });
+    };
+
+    //
+    // Send a COMMAND_DONE to the local computer
+    $scope.stopComputer= function(){
+        var command = {};
+        command.type = 1;
+        command.local_computer_id = $scope.localComputer.id;
+        command.is_executed = false;
+
+        return Restangular.post("command", command).then(function(){
+            alert("Sent shutdown to box");
+        },function(reason){
+            alert("Couldn't shutdown local computer: " + reason);
+        });
+    };
+
+
     $scope.loadComputer();
+    $scope.loadPrograms();
+
+
 }
 
 angular.module('Ruenoor').controller('LocalComputer',

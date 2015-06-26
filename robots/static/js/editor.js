@@ -19,6 +19,7 @@ function robotControl($scope, $routeParams, Restangular) {
         console.log($scope.editor.getSession().getValue());
         $scope.program.code = $scope.editor.getSession().getValue();
         $scope.program.save();
+        alert("Program file saved");
     }
 
 }
