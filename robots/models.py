@@ -41,9 +41,9 @@ COMMAND_STOP_PROGRAM=3
 
 class Command(SystemModel):
     local_computer = models.ForeignKey('LocalComputer')
-    type = models.IntegerField(default=COMMAND_NOOP)
+    type = models.IntegerField(default=COMMAND_NOOP, db_index=True)
     json_command = models.CharField(max_length="512", null=True)
-    is_executed = models.BooleanField(default=False)
+    is_executed = models.BooleanField(default=False, db_index=True)
 
 class Program(SystemModel):
     group = models.ManyToManyField(Group)
