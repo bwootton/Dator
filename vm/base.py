@@ -38,7 +38,6 @@ class Configurator(object):
         self.config = config
 
 
-
 CONFIG_LOCATION = "default.cfg"
 
 
@@ -78,7 +77,6 @@ class WorkerPool(object):
         self.job_list = {}
         self.shared_val = multiprocessing.Value('i',0)
 
-
     def start_program(self, program_id, refresh_time_sec, program):
         if program_id not in self.job_list.keys():
             should_stop = multiprocessing.Value('b', False)
@@ -101,6 +99,7 @@ COMMAND_STOP_PROGRAM = 3
 
 
 class CommandHandler(object):
+
     def __init__(self, worker_pool, data_connection):
         self.worker_pool = worker_pool
         self.data_connection = data_connection
@@ -109,27 +108,26 @@ class CommandHandler(object):
             COMMAND_STOP_PROGRAM: self.handle_stop,
         }
 
-
     def handle_commands(self, commands):
         done = False
         for command in commands:
             if command['type'] == COMMAND_NOOP:
-                data_connection.deactivate_command(command)
+                pass
             elif command['type'] == COMMAND_DONE:
                 done = True
-                data_connection.deactivate_command(command)
             else:
                 self.handler_map[command['type']](command)
 
+            data_connection.deactivate_command(command)
         return done
 
-
-    def handle_load(self, command, data_connection):
-        print("got load")
-
+    def handle_load(self, command):
+        program = self.data_connection.get_program(json.loads(command.json_command)['program_id'])
+        self.worker_pool.start_program(program.id, program.sleep_time_sec, program.code)
 
     def handle_stop(self, command):
-        print("go stop")
+        program = self.data_connection.get_program(json.loads(command.json_command)['program_id'])
+        self.worker_pool.stop_program(program.id)
 
 
 if __name__ == '__main__':
