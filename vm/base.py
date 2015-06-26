@@ -51,8 +51,7 @@ class DataConnection(object):
         config["secret_uuid"] = str(uuid4())
 
         url = config['server'] + "/api/v1/local_computer/?format=json"
-        headers = {'content-type': 'application/json'}
-        response = requests.post(url, data=json.dumps(self.configurator.get_config()), headers=headers)
+        response = requests.post(url, data=json.dumps(self.configurator.get_config()), headers=self.sec_header())
         new_config = json.loads(response.content)
         self.configurator.set_config(new_config)
 
@@ -62,17 +61,13 @@ class DataConnection(object):
         """
         config = self.configurator.get_config()
         url = config['server'] + "/api/v1/local_computer/{}/?format=json".format(config['id'])
-        response = requests.get(url, headers={'content-type': 'application/json', 'auth_key': config['secret_uuid']})
-        if 200 <= response.status_code < 300:
+        response = requests.get(url, headers= self.sec_header())
+        if self.check_response_ok(response):
             updated_config = json.loads(response.content)
             for key in updated_config.keys():
                 config[key] = updated_config[key]
             self.configurator.write_config(CONFIG_LOCATION)
-        else:
-            print "WARNING Config Lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
-            if response.content:
-                print response.content
-            return []
+
 
     def get_new_commands(self):
         """
@@ -80,16 +75,52 @@ class DataConnection(object):
         """
         config = self.configurator.get_config()
         id = config["id"]
-        secret_uuid = config["secret_uuid"]
         url = "{}/api/v1/command/?format=json&is_local_computer_id={}&is_executed=false".format(config['server'], id)
-        response = requests.get(url, headers={'auth_key': secret_uuid})
-        if 200 <= response.status_code < 300:
+        response = requests.get(url, headers = self.sec_header())
+        if self.check_response_ok(response):
             return json.loads(response.content)['objects']
+        return []
+
+    def deactivate_command(self, command):
+        config = self.configurator.get_config()
+        id = config["id"]
+        command['is_executed'] = True
+        url = "{}/api/v1/command/{}/?format=json&is_local_computer_id={}&is_executed=false".format(config['server'], command['id'], id)
+        response = requests.put(url, data=json.dumps(command), headers=self.sec_header())
+        self.check_response_ok(response)
+
+    def get_program(self, program_id):
+        """
+        :param program_id:
+        :return: the program object or None if it doesn't exist
+        """
+        config = self.configurator.get_config()
+        server = config["server"]
+        url = "{}/api/v1/program/{}?format=json".format(program_id)
+        response = server.get(url, headers = self.sec_header())
+        if self.check_response_ok(response):
+            return json.loads(response.content)
+        return None
+
+    def sec_header(self, base_header=None):
+        auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json'}
+        if base_header is None:
+            return auth_header
+        auth_header.update(base_header)
+
+    @classmethod
+    def check_response_ok(cls, response):
+        """
+        :return: True if http response is a 200 class response.  False info otherwise.
+        """
+        if 200 <= response.status_code < 300:
+            return True
         else:
-            print "WARNING Command lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
+            response_string = "WARNING Command lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
             if response.content:
-                print response.content
-            return []
+                response_string += response.content
+            print response_string
+            return False
 
 
 CONFIG_LOCATION = "default.cfg"
@@ -149,9 +180,41 @@ class WorkerPool(object):
         for program_id in self.job_list.keys():
             self.stop_program(program_id)
 
+COMMAND_NOOP = 0
+COMMAND_DONE = 1
+COMMAND_LOAD_PROGRAM = 2
+COMMAND_STOP_PROGRAM = 3
 
-def handle_commands(config, worker_pool):
-    return True
+
+class CommandHandler(object):
+    def __init__(self, worker_pool, data_connection):
+        self.worker_pool = worker_pool
+        self.handler_map = {
+            COMMAND_LOAD_PROGRAM: self.handle_load,
+            COMMAND_STOP_PROGRAM: self.handle_stop,
+        }
+
+
+    def handle_commands(self, commands):
+        done = False
+        for command in commands:
+            if command['type'] == COMMAND_NOOP:
+                data_connection.deactivate_command(command)
+                continue
+            elif command['type'] == COMMAND_DONE:
+                done = True
+            else:
+                self.handler_map[command['type']](command)
+            data_connection.deactivate_command(command)
+        return done
+
+
+    def handle_load(self, command):
+        print("got load")
+
+
+    def handle_stop(self, command):
+        print("go stop")
 
 
 if __name__ == '__main__':
@@ -162,13 +225,13 @@ if __name__ == '__main__':
     data_connection = DataConnection(configurator)
     data_connection.update_config()
     worker_pool = WorkerPool()
+    command_handler = CommandHandler(worker_pool, data_connection)
 
     done = False
-    worker_pool.start_program(1, 1, "print('hello world')")
 
-    for i in range(1):
+    while not done:
         commands = data_connection.get_new_commands()
-        done = handle_commands(commands, worker_pool)
+        done = command_handler.handle_commands(commands)
         time.sleep(configurator.get_config()['command_refresh_sec'])
 
     worker_pool.stop()

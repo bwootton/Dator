@@ -35,10 +35,13 @@ class LocalComputer(SystemModel):
 
 
 COMMAND_NOOP=0
+COMMAND_DONE=1
+COMMAND_LOAD_PROGRAM=2
+COMMAND_STOP_PROGRAM=3
 
 class Command(SystemModel):
     local_computer = models.ForeignKey('LocalComputer')
-    command_type = models.IntegerField(default=COMMAND_NOOP)
+    type = models.IntegerField(default=COMMAND_NOOP)
     json_command = models.CharField(max_length="512", null=True)
     is_executed = models.BooleanField(default=False)
 
