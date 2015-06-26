@@ -72,8 +72,8 @@ class DataConnection(object):
         """
         config = self.configurator.get_config()
         server = config["server"]
-        url = "{}/api/v1/program/{}?format=json".format(program_id)
-        response = server.get(url, headers = self.sec_header())
+        url = "{}/api/v1/program/{}?format=json".format(config["server"], program_id)
+        response = requests.get(url, headers=self.sec_header())
         if self.check_response_ok(response):
             return json.loads(response.content)
         return None

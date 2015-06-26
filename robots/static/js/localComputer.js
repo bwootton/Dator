@@ -1,54 +1,86 @@
-function LocalComputer($scope, $routeParams, $interval, Restangular){
+function LocalComputer($scope, $routeParams, $interval, Restangular) {
 
-    $scope.saveComputer = function(){
-        $scope.localComputer.save().then(function(computer){
+    $scope.saveComputer = function () {
+        $scope.localComputer.save().then(function (computer) {
             alert("Saved Computer");
-            $scope.loadComputer();
-        }, function(reason){
+            $scope.getComputer();
+        }, function (reason) {
             alert("Failed to Save " + reason);
         });
     };
 
-    $scope.loadComputer = function(){
-        return  Restangular.one("local_computer", $routeParams.id).get().then(function (localComputer){
-            $scope.localComputer=localComputer;
-        }, function(reason){
+    $scope.getComputer = function () {
+        return Restangular.one("local_computer", $routeParams.id).get().then(function (localComputer) {
+            $scope.localComputer = localComputer;
+        }, function (reason) {
             alert("Couldn't load localComputer: " + reason);
         });
     };
 
-    $scope.loadPrograms = function(){
-        return Restangular.all("program").getList().then(function(programs){
+    $scope.getPrograms = function () {
+        return Restangular.all("program").getList().then(function (programs) {
             $scope.programs = programs;
-        }, function(reason){
+        }, function (reason) {
             alert("Couldn't load programs: " + reason)
         });
     };
 
     //
     // Send a COMMAND_DONE to the local computer
-    $scope.stopComputer= function(){
+    $scope.stopComputer = function () {
         var command = {};
-        command.type = 1;
+        command.type = COMMAND_DONE;
         command.local_computer_id = $scope.localComputer.id;
 
 
-        return Restangular.all("command").post(command, "", {}, {}).then(function(){
+        return Restangular.all("command").post(command, "", {}, {}).then(function () {
             alert("Sent shutdown to box");
-        },function(reason){
+        }, function (reason) {
             alert("Couldn't shutdown local computer: " + reason);
         });
     };
 
+    /**
+     * Send a COMMAND_LOAD_PROGRAM to the local computer
+     */
+    $scope.loadProgram = function (program_id) {
+        var command = {};
+        command.type = COMMAND_LOAD_PROGRAM;
+        command.local_computer_id = $scope.localComputer.id;
+        command.json_command = JSON.stringify({'program_id': program_id});
 
-    $scope.loadComputer();
-    $scope.loadPrograms();
+
+        return Restangular.all("command").post(command, "", {}, {}).then(function () {
+            alert("Requested program start");
+        }, function (reason) {
+            alert("Couldn't start program on local computer: " + reason);
+        });
+    };
+    /**
+     * Send a COMMAND_STOP_PROGRAM to the local computer
+     */
+    $scope.stopProgram = function (program_id) {
+        var command = {};
+        command.type = COMMAND_STOP_PROGRAM;
+        command.local_computer_id = $scope.localComputer.id;
+        command.json_command = JSON.stringify({'program_id': program_id});
 
 
-    var promise = $interval($scope.loadComputer, 1000);
+        return Restangular.all("command").post(command, "", {}, {}).then(function () {
+            alert("Requested program stop");
+        }, function (reason) {
+            alert("Couldn't stop program on local computer: " + reason);
+        });
+    };
+
+    $scope.getComputer();
+    $scope.getPrograms();
+
+
+    var promise = $interval($scope.getComputer, 5000);
 
     // Cancel interval on page changes
-    $scope.$on('$destroy', function(){
+    $scope.$on('$destroy', function () {
         if (angular.isDefined(promise)) {
             $interval.cancel(promise);
             promise = undefined;
@@ -58,4 +90,4 @@ function LocalComputer($scope, $routeParams, $interval, Restangular){
 }
 
 angular.module('Ruenoor').controller('LocalComputer',
-    ['$scope','$routeParams', '$interval', 'Restangular', LocalComputer] );
+    ['$scope', '$routeParams', '$interval', 'Restangular', LocalComputer]);

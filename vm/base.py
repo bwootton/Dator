@@ -82,11 +82,18 @@ class WorkerPool(object):
             should_stop = multiprocessing.Value('b', False)
             self.job_list[program_id] = [should_stop, multiprocessing.Process(target=periodic_eval, args=(refresh_time_sec, program, should_stop, self.shared_val))]
             self.job_list[program_id][1].start()
+        else:
+            print "Program id {} already running".format(program_id)
 
     def stop_program(self, program_id):
-        self.job_list[program_id][0].value = True
-        self.job_list[program_id][1].join(20)
-        print "Stopped program id {}".format(program_id)
+        try:
+            job = self.job_list[program_id]
+            self.job_list[program_id][0].value = True
+            self.job_list[program_id][1].join(20)
+            del self.job_list[program_id]
+            print "Stopped job for program id {}".format(program_id)
+        except BaseException as e:
+            print "Failed to stop program {}".format(program_id)
 
     def stop(self):
         for program_id in self.job_list.keys():
@@ -122,12 +129,16 @@ class CommandHandler(object):
         return done
 
     def handle_load(self, command):
-        program = self.data_connection.get_program(json.loads(command.json_command)['program_id'])
-        self.worker_pool.start_program(program.id, program.sleep_time_sec, program.code)
+        program_command = json.loads(command['json_command'])
+        program = self.data_connection.get_program(program_command['program_id'])
+        print ("Starting program {}".format(program['id']))
+        self.worker_pool.start_program(program['id'], program['sleep_time_sec'], program['code'])
 
     def handle_stop(self, command):
-        program = self.data_connection.get_program(json.loads(command.json_command)['program_id'])
-        self.worker_pool.stop_program(program.id)
+        program_command = json.loads(command['json_command'])
+        program = self.data_connection.get_program(program_command['program_id'])
+
+        self.worker_pool.stop_program(program['id'])
 
 
 if __name__ == '__main__':

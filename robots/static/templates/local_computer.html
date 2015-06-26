@@ -33,16 +33,19 @@
                         </div>
                         <div class="form-group">
                             <label class="col-sm-2 control-label">Status</label>
+
                             <div class="col-sm-10">
-                                <i  ng-show="localComputer.is_running" class="fa fa-cog fa-spin" style="color: greenyellow;"></i>
-                                <span ng-show="localComputer.is_running"> Running</span>
-                                <i ng-hide="localComputer.is_running" class="fa fa-cog" style="color: yellow;"></i>
-                                <span ng-hide="localComputer.is_running"> Stopped</span>
+                                <div class="panel">
+                                    <i ng-show="localComputer.is_running" class="fa fa-cog fa-spin" style="color: greenyellow;"></i>
+                                    <span ng-show="localComputer.is_running"> Running</span>
+                                    <i ng-hide="localComputer.is_running" class="fa fa-cog" style="color: yellow;"></i>
+                                    <span ng-hide="localComputer.is_running"> Stopped</span>
+                                </div>
 
                             </div>
                         </div>
                         <button class="btn btn-success" ng-click="saveComputer()">Save</button>
-                        <button class="btn btn-warning" ng-click="stopComputer()">Stop Programs</button>
+                        <button class="btn btn-warning" ng-click="stopComputer()">Shut Down</button>
                         <a class="btn btn-primary   " href="/ruenoor/#/">Main Page</a>
                     </form>
                 </div>
@@ -55,18 +58,34 @@
                     <div class="panel-title">Programs</div>
                 </div>
                 <div class="panel-body">
-                    <table class="table-bordered">
-                        <thead>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
                             <tr>
+                                <th>ID</th>
                                 <th>Name</th>
+                                <th class="text-center">Start</th>
+                                <th class="text-center">Stop</th>
                             </tr>
-                        </thead>
-                        <tbody>
+                            </thead>
+                            <tbody>
                             <tr ng-repeat="program in programs">
+                                <td>{{ program.id }}</td>
                                 <td>{{ program.name }}</td>
+                                <td>
+                                    <button class="center-block" ng-click="loadProgram(program.id)" style="background-color: transparent; color: transparent;">
+                                        <i class="fa fa-play" style="color: greenyellow; background-color: transparent;" ></i>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button class="center-block" ng-click="stopProgram(program.id)" style="background-color: transparent; color: transparent;">
+                                        <i class="fa fa-stop" style="color: yellow; background-color: transparent;"></i>
+                                    </button>
+                                </td>
                             </tr>
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
