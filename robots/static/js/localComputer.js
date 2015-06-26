@@ -1,4 +1,4 @@
-function LocalComputer($scope, $routeParams,Restangular){
+function LocalComputer($scope, $routeParams, $interval, Restangular){
 
     $scope.saveComputer = function(){
         $scope.localComputer.save().then(function(computer){
@@ -31,9 +31,9 @@ function LocalComputer($scope, $routeParams,Restangular){
         var command = {};
         command.type = 1;
         command.local_computer_id = $scope.localComputer.id;
-        command.is_executed = false;
 
-        return Restangular.post("command", command).then(function(){
+
+        return Restangular.all("command").post(command, "", {}, {}).then(function(){
             alert("Sent shutdown to box");
         },function(reason){
             alert("Couldn't shutdown local computer: " + reason);
@@ -45,7 +45,17 @@ function LocalComputer($scope, $routeParams,Restangular){
     $scope.loadPrograms();
 
 
+    var promise = $interval($scope.loadComputer, 1000);
+
+    // Cancel interval on page changes
+    $scope.$on('$destroy', function(){
+        if (angular.isDefined(promise)) {
+            $interval.cancel(promise);
+            promise = undefined;
+        }
+    });
+
 }
 
 angular.module('Ruenoor').controller('LocalComputer',
-    ['$scope','$routeParams','Restangular', LocalComputer] );
+    ['$scope','$routeParams', '$interval', 'Restangular', LocalComputer] );

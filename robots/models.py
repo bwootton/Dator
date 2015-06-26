@@ -32,6 +32,7 @@ class LocalComputer(SystemModel):
     secret_uuid = models.CharField(max_length=128)
     system = models.ForeignKey('System', null=True)
     command_refresh_sec = models.IntegerField(default=10)
+    is_running = models.BooleanField(default=False)
 
 
 COMMAND_NOOP=0
