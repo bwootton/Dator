@@ -21,6 +21,7 @@ Landscape-Client==14.12
 launchpadlib==1.10.2
 lazr.restfulclient==0.13.3
 lazr.uri==1.0.3
+lockfile==0.10.2
 numpy==1.9.2
 oauth==1.0.1
 PAM==0.4.2

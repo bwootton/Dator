@@ -55,6 +55,7 @@ function MainControl($scope, $location, Restangular){
         });
     };
 
+
     $scope.claimComputer = function(){
         // do nothing right now;
     };

@@ -3,6 +3,12 @@ from django.db import models
 from django.contrib.auth.models import Group
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
+from robots import file_provider
+import pandas as pd
+import django.utils.timezone as tmz
+import pytz
+
+import delorean
 
 
 class SystemModel(models.Model):
@@ -70,9 +76,21 @@ class MapPoint(SystemModel):
     controller = models.ForeignKey('LocalComputer')
 
 
+SIGNAL_PROVIDER = file_provider
+
 class Signal(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
+    system = models.ForeignKey('System', null=True)
+    local_computer = models.ForeignKey('LocalComputer', null=True)
+
+    def add_point(self, value):
+        when = tmz.now().astimezone(pytz.UTC)
+        millisec = int(delorean.Delorean(when, timezone="UTC").epoch()*1000)
+        SIGNAL_PROVIDER.append_data(self.uuid, "[{},{}]".format(value, millisec))
+
+    def get_data(self):
+        data = SIGNAL_PROVIDER.get_blob(self.uuid)
 
 
 
