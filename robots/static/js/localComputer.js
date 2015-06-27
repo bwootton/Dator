@@ -25,8 +25,9 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         });
     };
 
-    //
-    // Send a COMMAND_DONE to the local computer
+    /**
+     * Send a COMMAND_DONE to the local computer
+     */
     $scope.stopComputer = function () {
         var command = {};
         command.type = COMMAND_DONE;
@@ -56,6 +57,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
             alert("Couldn't start program on local computer: " + reason);
         });
     };
+
     /**
      * Send a COMMAND_STOP_PROGRAM to the local computer
      */
@@ -73,8 +75,15 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         });
     };
 
+    /**
+     * Get a list of signals associated with the computer.
+     */
+    $scope.getSignals = function(){
+        return Restangular.all("signal")
+    }
     $scope.getComputer();
     $scope.getPrograms();
+
 
 
     var promise = $interval($scope.getComputer, 5000);

@@ -4,7 +4,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from robots.models import System, Program, Command, LocalComputer
+from robots.models import System, Program, Command, LocalComputer, Signal
 
 
 class SystemResource(ModelResource):
@@ -53,5 +53,37 @@ class LocalComputerResource(ModelResource):
         always_return_data = True
 
 
+class SignalResource(ModelResource):
+    local_computer_id = IntegerField(attribute="local_computer_id")
+    system_id = IntegerField(attribute="system_id")
+
+    class Meta:
+        queryset = Signal.objects.all()
+        authorization = Authorization()
+        authentication = Authentication()
+        resource_name = 'signal'
+        always_return_data = True
+
+        filtering = {
+            'local_computer_id': ALL_WITH_RELATIONS,
+            'system_id': ALL_WITH_RELATIONS
+        }
+
+
+class SettingResource(ModelResource):
+    local_computer_id = IntegerField(attribute="local_computer_id")
+    system_id = IntegerField(attribute="system_id")
+
+    class Meta:
+        queryset = System.objects.all()
+        authorization = Authorization()
+        authentication = Authentication()
+        resource_name = 'setting'
+        always_return_data = True
+
+        filtering = {
+            'local_computer_id': ALL_WITH_RELATIONS,
+            'system_id': ALL_WITH_RELATIONS
+        }
 
 

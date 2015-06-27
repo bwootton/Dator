@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from robots.models import System, Program, SystemModel, Map, LocalComputer, Command
+from robots.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal
 import json
 
 class TestAPI(TestCase):
@@ -56,3 +56,19 @@ class TestAPI(TestCase):
         response = self.client.get("/api/v1/command/?format=json&local_computer_id={}&is_executed=true".format(local_computer.id))
         r_data = json.loads(response.content)['objects']
         self.assertEquals(len(r_data), 0 )
+
+    def test_filter_signal_by_local_computer(self):
+        local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
+        signal = Signal.objects.create(local_computer=local_computer, name="a_signal")
+        response = self.client.get("/api/v1/signal/?format=json&local_computer_id={}".format(local_computer.id))
+        self.assertContains(response, "a_signal")
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals("a_signal", r_data[0]['name'])
+
+    def test_filter_setting_by_local_computer(self):
+        local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
+        signal = System.objects.create(local_computer=local_computer, key="a_signal", value="hello")
+        response = self.client.get("/api/v1/setting/?format=json&local_computer_id={}".format(local_computer.id))
+        self.assertContains(response, "a_signal")
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals("a_signal", r_data[0]['name'])

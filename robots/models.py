@@ -80,7 +80,7 @@ SIGNAL_PROVIDER = file_provider
 
 class Signal(SystemModel):
     group = models.ManyToManyField(Group)
-    name = models.CharField(max_length=128)
+    name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
 
@@ -91,6 +91,23 @@ class Signal(SystemModel):
 
     def get_data(self):
         data = SIGNAL_PROVIDER.get_blob(self.uuid)
+        tokens = data.split("]")
+        values = [float(token[1:].split(",")[0]) for token in tokens]
+        dates = [tmz.datetime.fromtimestamp(token.split(",")[1], tz=pytz.UTC) for token in tokens]
+        return values, dates
+
+    def get_time_series(self):
+        values, dates = self.get_data()
+        return pd.TimeSeries(values, index=dates)
+
+class Setting(SystemModel):
+    key = models.CharField(max_length=128, db_index=True)
+    value = models.CharField(max_length=128)
+    local_computer = models.ForeignKey('LocalComputer', null=True)
+    system = models.ForeignKey('System', null=True)
+
+    def __unicode__(self):
+        return '{},{}'.format(self.key, self.value)
 
 
 
@@ -106,6 +123,7 @@ class SignalBlob(SystemModel):
 @receiver(pre_save, sender=Signal)
 @receiver(pre_save, sender=SignalBlob)
 @receiver(pre_save, sender=System)
+@receiver(pre_save, sender=Setting)
 def set_uuid(sender, instance, **kwargs):
     if not instance.uuid:
         instance.uuid = str(uuid4())

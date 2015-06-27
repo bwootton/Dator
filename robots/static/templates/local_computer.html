@@ -5,7 +5,7 @@
                 <div class="panel-heading">
                     <div class="panel-title">
                         Local Computer
-                        <small>{{ localComputer.name }}</small>
+                        <small>{{ localComputer.name }} - {{ localComputer.id }}</small>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -80,6 +80,38 @@
                                 <td>
                                     <button class="center-block" ng-click="stopProgram(program.id)" style="background-color: transparent; color: transparent;">
                                         <i class="fa fa-stop" style="color: yellow; background-color: transparent;"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Signals</div>
+                </div>
+                <div class="panel-body">
+
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>UUID</th>
+                                <th class="text-center">Display graph</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr ng-repeat="signal in signals">
+                                <td>{{ signal.id }}</td>
+                                <td>{{ signal.name }}</td>
+                                <td>{{ signal.uuid }}</td>
+                                <td>
+                                    <button class="center-block" ng-click="displaySignal(signal.id)" style="background-color: transparent; color: transparent;">
+                                        <i class="fa fa-area-chart" style="color: greenyellow; background-color: transparent;" ></i>
                                     </button>
                                 </td>
                             </tr>
