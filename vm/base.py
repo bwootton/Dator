@@ -4,7 +4,7 @@ from uuid import uuid4
 import multiprocessing
 import requests
 import time
-from vm.data_connection import DataConnection
+from data_connection import DataConnection
 
 
 class Configurator(object):
@@ -64,10 +64,13 @@ def init_configurator():
 
 def periodic_eval(refresh_time_sec, program, should_stop, shared_val):
     while not should_stop.value:
-        shared_val.value += 1
-        eval(compile(program, '<string>', 'exec'))
-        time.sleep(refresh_time_sec)
-
+        try:
+            eval(compile(program, '<string>', 'exec'))
+            time.sleep(refresh_time_sec)
+        except BaseException as e:
+            print ("Error running uploaded program {}".format(e))
+            if e.message:
+                print e.message
     return periodic_eval
 
 
