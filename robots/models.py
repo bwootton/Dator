@@ -101,6 +101,7 @@ class Signal(SystemModel):
         return pd.TimeSeries(values, index=dates)
 
 class Setting(SystemModel):
+    group = models.ManyToManyField(Group)
     key = models.CharField(max_length=128, db_index=True)
     value = models.CharField(max_length=128)
     local_computer = models.ForeignKey('LocalComputer', null=True)
@@ -108,6 +109,11 @@ class Setting(SystemModel):
 
     def __unicode__(self):
         return '{},{}'.format(self.key, self.value)
+
+class BinaryBlob(SystemModel):
+    group = models.ManyToManyField(Group)
+    name = models.CharField(max_length=128, db_index=True)
+
 
 
 
