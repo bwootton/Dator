@@ -17,6 +17,14 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         });
     };
 
+    $scope.getComputerStatus = function () {
+        return Restangular.one("Local_computer", $routeParams.id).get().then(function (localComputer) {
+            $scope.localComputer.is_running = localComputer.is_running;
+        }, function (reason) {
+            console.log("Couldn't load localComputer: " + reason);
+        });
+    };
+
     $scope.getPrograms = function () {
         return Restangular.all("program").getList().then(function (programs) {
             $scope.programs = programs;
@@ -78,15 +86,15 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
     /**
      * Get a list of signals associated with the computer.
      */
-    $scope.getSignals = function(){
+    $scope.getSignals = function () {
         return Restangular.all("signal")
-    }
+    };
+
     $scope.getComputer();
     $scope.getPrograms();
 
 
-
-    var promise = $interval($scope.getComputer, 5000);
+    var promise = $interval($scope.getComputerStatus, 5000);
 
     // Cancel interval on page changes
     $scope.$on('$destroy', function () {
