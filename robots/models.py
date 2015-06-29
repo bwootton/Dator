@@ -57,7 +57,7 @@ class Program(SystemModel):
     code = models.TextField(null=True)
     description = models.TextField(null=True)
     name = models.CharField(max_length=128)
-    sleep_time_sec = models.IntegerField(default=1)
+    sleep_time_sec = models.FloatField(default=1.0)
 
 class Map(SystemModel):
     group = models.ManyToManyField(Group)
