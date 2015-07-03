@@ -1,3 +1,4 @@
+import json
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
@@ -16,13 +17,16 @@ def root_view(request):
 
 def add_signal_data(request, signal_id):
     """
-    Add a data point to a signal
+    Add a data point to a signal. Incoming signal in json body.  Format:
+    [[<value>,<time in millisec since epoch>], ...]
+    signal points must be in ascending order of occurence.
     """
     if request.POST:
         try:
-            value = request.POST
+            data = json.loads(request.body)
             signal = Signal.objects.get(signal_id=signal_id)
-            signal.add_point(value)
+            for datum in data:
+                signal.add_point(datum[0], datum[1])
             response_dict = {'status': 'succeeded'}
             return HttpResponse(response_dict, status=200, content_type="application/json")
         except BaseException as e:

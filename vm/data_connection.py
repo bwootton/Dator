@@ -71,18 +71,29 @@ class DataConnection(object):
         :return: the program object or None if it doesn't exist
         """
         config = self.configurator.get_config()
-        server = config["server"]
         url = "{}/api/v1/program/{}?format=json".format(config["server"], program_id)
         response = requests.get(url, headers=self.sec_header())
         if self.check_response_ok(response):
             return json.loads(response.content)
         return None
 
+    def add_signal_points(self, signal_id, signal_points):
+        """ Add sorted points to a signal
+        :param signal_id: The id of the signal to add points to
+        :param signal_points: Signal points as a list of lists.
+        :return:
+        """
+        config = self.configurator.get_config()
+
+        url = "{}/api/v1/signal/{}/points?signal_id={}".format(config["server",signal_id])
+
     def sec_header(self, base_header=None):
         auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json'}
         if base_header is None:
             return auth_header
         auth_header.update(base_header)
+
+
 
     @classmethod
     def check_response_ok(cls, response):
@@ -97,4 +108,6 @@ class DataConnection(object):
                 response_string += response.content
             print response_string
             return False
+
+
 

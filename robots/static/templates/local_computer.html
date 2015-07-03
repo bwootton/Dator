@@ -46,7 +46,7 @@
                         </div>
                         <button class="btn btn-success" ng-click="saveComputer()">Save</button>
                         <button class="btn btn-warning" ng-click="stopComputer()">Shut Down</button>
-                        <a class="btn btn-primary   " href="/ruenoor/#/">Main Page</a>
+                        <a class="btn btn-primary" href="/ruenoor/#/">Main Page</a>
                     </form>
                 </div>
 
@@ -74,7 +74,7 @@
                                 <td>{{ program.name }}</td>
                                 <td>
                                     <button class="center-block" ng-click="loadProgram(program.id)" style="background-color: transparent; color: transparent;">
-                                        <i class="fa fa-play" style="color: greenyellow; background-color: transparent;" ></i>
+                                        <i class="fa fa-play" style="color: greenyellow; background-color: transparent;"></i>
                                     </button>
                                 </td>
                                 <td>
@@ -93,30 +93,34 @@
                     <div class="panel-title">Signals</div>
                 </div>
                 <div class="panel-body">
-
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th>UUID</th>
-                                <th class="text-center">Display graph</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="signal in signals">
-                                <td>{{ signal.id }}</td>
-                                <td>{{ signal.name }}</td>
-                                <td>{{ signal.uuid }}</td>
-                                <td>
-                                    <button class="center-block" ng-click="displaySignal(signal.id)" style="background-color: transparent; color: transparent;">
-                                        <i class="fa fa-area-chart" style="color: greenyellow; background-color: transparent;" ></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <button><i class="fa fa-plus" style="color: white; background-color: transparent;"></i></button>
+                    </div>
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Name</th>
+                                    <th>UUID</th>
+                                    <th class="text-center">Display graph</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="signal in signals">
+                                    <td>{{ signal.id }}</td>
+                                    <td>{{ signal.name }}</td>
+                                    <td>{{ signal.uuid }}</td>
+                                    <td>
+                                        <button class="center-block" ng-click="displaySignal(signal.id)" style="background-color: transparent; color: transparent;">
+                                            <i class="fa fa-area-chart" style="color: greenyellow; background-color: transparent;"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>

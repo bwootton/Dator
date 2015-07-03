@@ -84,12 +84,17 @@ class Signal(SystemModel):
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
 
-    def add_point(self, value):
-        when = tmz.now().astimezone(pytz.UTC)
-        millisec = int(delorean.Delorean(when, timezone="UTC").epoch()*1000)
-        SIGNAL_PROVIDER.append_data(self.uuid, "[{},{}]".format(value, millisec))
+    def add_points(self, data_points):
+        """Add points to the signal
+        :param data_points [[<float value>,<time in millisec>],...]
+        """
+        SIGNAL_PROVIDER.startup()
+        SIGNAL_PROVIDER.append_data(self.uuid,
+                                    ''.join(["[{},{}]".format(datum[0],datum[1]) for datum in data_points]))
 
-    def get_data(self):
+
+    def _get_data(self):
+        SIGNAL_PROVIDER.startup()
         data = SIGNAL_PROVIDER.get_blob(self.uuid)
         tokens = data.split("]")
         values = [float(token[1:].split(",")[0]) for token in tokens]
@@ -97,8 +102,12 @@ class Signal(SystemModel):
         return values, dates
 
     def get_time_series(self):
-        values, dates = self.get_data()
+        values, dates = self._get_data()
         return pd.TimeSeries(values, index=dates)
+
+    def clear(self):
+        SIGNAL_PROVIDER.startup()
+        SIGNAL_PROVIDER.clear(self.uuid)
 
 class Setting(SystemModel):
     group = models.ManyToManyField(Group)

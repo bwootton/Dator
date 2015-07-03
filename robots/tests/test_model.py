@@ -1,5 +1,5 @@
 from django.test import TestCase
-from robots.models import System
+from robots.models import System, Signal
 
 
 class TestModel(TestCase):
@@ -25,5 +25,12 @@ class TestModel(TestCase):
         self.system.save()
         system2 = System.objects.get(uuid=self.system.uuid)
         self.assertIsNotNone(system2)
+
+    def test_add_get_points(self):
+        signal = Signal.objects.create(system=self.system,
+                                       name='a_signal')
+        signal.add_points([[1,12234],[2,324234]])
+        # points = signal.get_points()
+        # self.assertEqual(len(points), 2)
 
 
