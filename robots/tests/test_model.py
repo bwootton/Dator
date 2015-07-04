@@ -34,7 +34,7 @@ class TestModel(TestCase):
         n1 = Signal.utc_to_millisec(tmz.now())
         n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
         signal.add_points([[1, n1], [2, n2]])
-        points = signal._get_data()
+        points = signal.get_data()
 
         self.assertEqual(2, len(points))
         self.assertEqual(1,  points[0][0])
@@ -51,7 +51,7 @@ class TestModel(TestCase):
         signal.add_points([[2,n2]])
 
 
-        points = signal._get_data()
+        points = signal.get_data()
         self.assertEqual(2, len(points))
         self.assertEqual(1,  points[0][0])
         self.assertEqual(2, points[1][0])

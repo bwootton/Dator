@@ -93,7 +93,7 @@ class Signal(SystemModel):
                                     ''.join(["[{:.15},{:.15}]".format(float(datum[0]),float(datum[1])) for datum in data_points]))
 
 
-    def _get_data(self):
+    def get_data(self):
         SIGNAL_PROVIDER.startup()
         data = SIGNAL_PROVIDER.get_blob(self.uuid)
 
@@ -114,7 +114,7 @@ class Signal(SystemModel):
         return delorean.Delorean(dt, timezone="UTC").epoch()
 
     def get_time_series(self):
-        values, dates = self._get_data()
+        values, dates = self.get_data()
         return pd.TimeSeries(values, index=dates)
 
 

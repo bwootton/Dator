@@ -15,28 +15,30 @@ def root_view(request):
     return render(request, 'root_view.html')
 
 
-def add_signal_data(request, signal_id):
+def signal_data(request, signal_id):
     """
-    Add a data point to a signal. Incoming signal in json body.  Format:
-    [[<value>,<time in millisec since epoch>], ...]
+    Add data points to or get a signal. Incoming/Outgoing signal in json body.  Format:
+    [[<value>,<utc time in millisec since epoch>], ...]
     signal points must be in ascending order of occurence.
     """
-    if request.POST:
+    try:
+        signal = Signal.objects.get(id=signal_id)
+    except Signal.DoesNotExist as e:
+        return HttpResponse({'status': 'failed - Signal requested does not exist'}, status=404)
+
+    if request.method=='POST':
         try:
             data = json.loads(request.body)
-            signal = Signal.objects.get(signal_id=signal_id)
-            for datum in data:
-                signal.add_point(datum[0], datum[1])
+            signal.add_points(data)
             response_dict = {'status': 'succeeded'}
             return HttpResponse(response_dict, status=200, content_type="application/json")
         except BaseException as e:
             return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
 
-def get_signal_data(request, signal_id):
-    """
+    elif request.method =='GET':
+        try:
+            body = json.dumps(signal.get_data())
+            return HttpResponse(body, status=200, content_type="application/json")
+        except BaseException as e:
+            return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
 
-    :param request:
-    :param signal_id:
-    :return:
-    """
-    pass
