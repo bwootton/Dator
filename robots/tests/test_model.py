@@ -1,6 +1,8 @@
 from django.test import TestCase
 from robots.models import System, Signal
-
+import django.utils.timezone as tmz
+import pytz
+import delorean
 
 class TestModel(TestCase):
 
@@ -29,8 +31,36 @@ class TestModel(TestCase):
     def test_add_get_points(self):
         signal = Signal.objects.create(system=self.system,
                                        name='a_signal')
-        signal.add_points([[1,12234],[2,324234]])
-        # points = signal.get_points()
-        # self.assertEqual(len(points), 2)
+        n1 = Signal.utc_to_millisec(tmz.now())
+        n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
+        signal.add_points([[1, n1], [2, n2]])
+        points = signal._get_data()
+
+        self.assertEqual(2, len(points))
+        self.assertEqual(1,  points[0][0])
+        self.assertEqual(2, points[1][0])
+        self.assertAlmostEqual(n1, points[0][1],2)
+        self.assertAlmostEqual(n2, points[1][1],2)
+
+    def test_append_points(self):
+        signal = Signal.objects.create(system=self.system,
+                                       name='a_signal')
+        n1 = Signal.utc_to_millisec(tmz.now())
+        n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
+        signal.add_points([[1,n1]])
+        signal.add_points([[2,n2]])
 
 
+        points = signal._get_data()
+        self.assertEqual(2, len(points))
+        self.assertEqual(1,  points[0][0])
+        self.assertEqual(2, points[1][0])
+        self.assertAlmostEqual(n1, points[0][1],2)
+        self.assertAlmostEqual(n2, points[1][1],2)
+
+
+    def test_utc_time_functions(self):
+        n1 = tmz.now()
+        n1_ms = Signal.utc_to_millisec(n1)
+        n1_back = Signal.millisec_to_utc(n1_ms)
+        self.assertEqual(n1, n1_back)

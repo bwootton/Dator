@@ -31,3 +31,12 @@ def add_signal_data(request, signal_id):
             return HttpResponse(response_dict, status=200, content_type="application/json")
         except BaseException as e:
             return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
+
+def get_signal_data(request, signal_id):
+    """
+
+    :param request:
+    :param signal_id:
+    :return:
+    """
+    pass

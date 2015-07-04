@@ -18,7 +18,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
     };
 
     $scope.getComputerStatus = function () {
-        return Restangular.one("Local_computer", $routeParams.id).get().then(function (localComputer) {
+        return Restangular.one("local_computer", $routeParams.id).get().then(function (localComputer) {
             $scope.localComputer.is_running = localComputer.is_running;
         }, function (reason) {
             console.log("Couldn't load localComputer: " + reason);

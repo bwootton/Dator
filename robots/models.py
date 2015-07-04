@@ -90,20 +90,33 @@ class Signal(SystemModel):
         """
         SIGNAL_PROVIDER.startup()
         SIGNAL_PROVIDER.append_data(self.uuid,
-                                    ''.join(["[{},{}]".format(datum[0],datum[1]) for datum in data_points]))
+                                    ''.join(["[{:.15},{:.15}]".format(float(datum[0]),float(datum[1])) for datum in data_points]))
 
 
     def _get_data(self):
         SIGNAL_PROVIDER.startup()
         data = SIGNAL_PROVIDER.get_blob(self.uuid)
+
         tokens = data.split("]")
-        values = [float(token[1:].split(",")[0]) for token in tokens]
-        dates = [tmz.datetime.fromtimestamp(token.split(",")[1], tz=pytz.UTC) for token in tokens]
-        return values, dates
+        points = []
+        for token in tokens:
+            if token != '':
+                ts = token[1:].split(",")
+                points.append((float(ts[0]), float(ts[1])))
+        return points
+
+    @classmethod
+    def millisec_to_utc(cls, millisec):
+        return tmz.datetime.fromtimestamp(float(millisec), tz=pytz.UTC)
+
+    @classmethod
+    def utc_to_millisec(cls, dt):
+        return delorean.Delorean(dt, timezone="UTC").epoch()
 
     def get_time_series(self):
         values, dates = self._get_data()
         return pd.TimeSeries(values, index=dates)
+
 
     def clear(self):
         SIGNAL_PROVIDER.startup()

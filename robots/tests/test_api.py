@@ -1,5 +1,5 @@
 from django.test import TestCase, Client
-from robots.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal
+from robots.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal, Setting
 import json
 
 class TestAPI(TestCase):
@@ -67,8 +67,8 @@ class TestAPI(TestCase):
 
     def test_filter_setting_by_local_computer(self):
         local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
-        signal = System.objects.create(local_computer=local_computer, key="a_signal", value="hello")
+        signal = Setting.objects.create(local_computer=local_computer, key="a_signal", value="hello")
         response = self.client.get("/api/v1/setting/?format=json&local_computer_id={}".format(local_computer.id))
         self.assertContains(response, "a_signal")
         r_data = json.loads(response.content)['objects']
-        self.assertEquals("a_signal", r_data[0]['name'])
+        self.assertEquals("a_signal", r_data[0]['key'])

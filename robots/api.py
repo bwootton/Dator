@@ -4,7 +4,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from robots.models import System, Program, Command, LocalComputer, Signal
+from robots.models import System, Program, Command, LocalComputer, Signal, Setting
 
 
 class SystemResource(ModelResource):
@@ -55,7 +55,7 @@ class LocalComputerResource(ModelResource):
 
 class SignalResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
-    system_id = IntegerField(attribute="system_id")
+    system_id = IntegerField(attribute="system_id", null=True)
 
     class Meta:
         queryset = Signal.objects.all()
@@ -72,10 +72,10 @@ class SignalResource(ModelResource):
 
 class SettingResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
-    system_id = IntegerField(attribute="system_id")
+    system_id = IntegerField(attribute="system_id", null=True)
 
     class Meta:
-        queryset = System.objects.all()
+        queryset = Setting.objects.all()
         authorization = Authorization()
         authentication = Authentication()
         resource_name = 'setting'

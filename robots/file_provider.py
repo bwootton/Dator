@@ -26,23 +26,17 @@ def get_blob(uuid):
     lock = LockFile(file_name(uuid), timeout=10)
     with lock:
         with open(file_name(uuid), "r") as input:
-            return input.readall()
+            return input.read()
 
 def write_blob(uuid, blob):
-    print "getting lock"
     lock = LockFile(file_name(uuid), timeout=10)
-    print "created lock"
     with lock:
-        print "got lock"
         with open(file_name(uuid), "w") as input:
             input.write(blob)
 
 def append_data(uuid, value):
-    print "getting lock"
     lock = LockFile(file_name(uuid)+".lock", timeout=10)
-    print "created lock {}".format(lock.path)
     with lock:
-        print "got lock, opening {}".format(file_name(uuid))
         with open(file_name(uuid), "a") as output:
             output.write(value)
 

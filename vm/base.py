@@ -121,6 +121,8 @@ class CommandHandler(object):
     def handle_commands(self, commands):
         done = False
         for command in commands:
+
+            print ("Rcx command {}".format(command["type"]))
             if command['type'] == COMMAND_NOOP:
                 pass
             elif command['type'] == COMMAND_DONE:
