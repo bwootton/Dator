@@ -66,7 +66,8 @@ class SignalResource(ModelResource):
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
-            'system_id': ALL_WITH_RELATIONS
+            'system_id': ALL_WITH_RELATIONS,
+            'name': 'eq'
         }
 
 

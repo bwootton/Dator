@@ -84,8 +84,18 @@ class DataConnection(object):
         :return:
         """
         config = self.configurator.get_config()
+        url = "{}/data_api/v1/signal/{}/".format(config["server"], signal_id)
+        response = requests.post(url, data=signal_points, headers=self.sec_header())
+        if not DataConnection.check_response_ok(response):
+            print "Error posting signal data {}".format(response.content)
 
-        url = "{}/api/v1/signal/{}/points?signal_id={}".format(config["server",signal_id])
+    def add_signal_points_by_name(self, signal_name, signal_points):
+        config = self.configurator.get_config()
+
+        url = "{}/api/v1/signal/".format(config["server"])
+        response = requests.get(url, params={'name': signal_name, 'local_computer_id': config['id']})
+        id = json.loads(response.content)['id']
+        self.add_signal_points(id, signal_points)
 
     def sec_header(self, base_header=None):
         auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json'}

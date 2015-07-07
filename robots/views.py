@@ -35,7 +35,7 @@ def signal_data(request, signal_id):
         except BaseException as e:
             return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
 
-    elif request.method =='GET':
+    elif request.method=='GET':
         try:
             body = json.dumps(signal.get_data())
             return HttpResponse(body, status=200, content_type="application/json")

@@ -23,7 +23,7 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(v1_api.urls)),
     url(r'^ruenoor/', simple_view, name='SimpleURL'),
-    url(r'^data_api/', include([
+    url(r'^data_api/v1/', include([
         url(r'^signal/(?P<signal_id>\d+)/', signal_data, name='signal_data'),
     ])),
     url(r'^$', root_view, name='RootView')
