@@ -80,7 +80,7 @@ class DataConnection(object):
     def add_signal_points(self, signal_id, signal_points):
         """ Add sorted points to a signal
         :param signal_id: The id of the signal to add points to
-        :param signal_points: Signal points as a list of lists.
+        :param signal_points:
         :return:
         """
         config = self.configurator.get_config()
@@ -90,12 +90,31 @@ class DataConnection(object):
             print "Error posting signal data {}".format(response.content)
 
     def add_signal_points_by_name(self, signal_name, signal_points):
+        """
+        Add points to a signal belonging to this local_computer.
+        :param signal_name:
+        :param signal_points: points in format[[<value>,<millisec>]
+        :return:
+        """
         config = self.configurator.get_config()
 
         url = "{}/api/v1/signal/".format(config["server"])
-        response = requests.get(url, params={'name': signal_name, 'local_computer_id': config['id']})
-        id = json.loads(response.content)['id']
-        self.add_signal_points(id, signal_points)
+        response = requests.get(url, data={'name': signal_name, 'local_computer_id': config['id']},
+                                headers=self.sec_header())
+        signal_id = json.loads(response.content)['id']
+        self.add_signal_points(signal_id, signal_points)
+
+    def get_or_create_signal(self, signal_name):
+        config =self.configurator.get_config()
+        url = "{}/api/v1/signal".format(config["server"])
+        params={'name': signal_name, 'local_computer_id': config['id']}
+        response = requests.get(url, data=params, headers=self.sec_header())
+        if response.status == 404:
+            response = requests.post(url, data=params, headers=self.sec_header())
+            response = requests.get(url, data=params, headers=self.sec_header())
+
+        return json.loads(response.content)
+
 
     def sec_header(self, base_header=None):
         auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json'}
