@@ -62,7 +62,7 @@ def init_configurator():
     return configurator
 
 
-def periodic_eval(refresh_time_sec, program, should_stop, shared_val):
+def periodic_eval(refresh_time_sec, program, should_stop, shared_val, data_connection):
     while not should_stop.value:
         try:
             eval(compile(program, '<string>', 'exec'))
