@@ -104,6 +104,24 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         }
     });
 
+    $scope.newProgram = function(){
+        return Restangular.all("program").post({name:"new program", code:""}).then(function (created){
+            $scope.getPrograms();
+        });
+    };
+
+    $scope.deleteProgram = function(programId){
+        var program = _.find($scope.programs, function(program){
+            return program.id == programId;
+        });
+        return Restangular.one("program", program.id).get().then(function(foundProgram){
+            foundProgram.remove().then(
+                function(removeStatus){
+                    $scope.getPrograms();
+                });
+        });
+    };
+
 }
 
 angular.module('Ruenoor').controller('LocalComputer',

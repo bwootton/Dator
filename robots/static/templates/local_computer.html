@@ -58,35 +58,47 @@
                     <div class="panel-title">Programs</div>
                 </div>
                 <div class="panel-body">
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Name</th>
-                                <th class="text-center">Start</th>
-                                <th class="text-center">Stop</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <tr ng-repeat="program in programs">
-                                <td>{{ program.id }}</td>
-                                <td>{{ program.name }}</td>
-                                <td>
-                                    <button class="center-block" ng-click="loadProgram(program.id)" style="background-color: transparent; color: transparent;">
-                                        <i class="fa fa-play" style="color: greenyellow; background-color: transparent;"></i>
-                                    </button>
-                                </td>
-                                <td>
-                                    <button class="center-block" ng-click="stopProgram(program.id)" style="background-color: transparent; color: transparent;">
-                                        <i class="fa fa-stop" style="color: yellow; background-color: transparent;"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                            </tbody>
-                        </table>
+                    <div class="row">
+                        <button ng-click="newProgram()"><i class="fa fa-plus" style="color: black; background-color: transparent;"></i></button>
+                    </div>
+                    <div class="row">
+                        <div>
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th class="text-center">Start</th>
+                                        <th class="text-center">Stop</th>
+                                        <th class="text-center">Delete</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    <tr ng-repeat="program in programs">
+                                        <td>{{ program.id }}</td>
+                                        <td><a href="/ruenoor/#/editor/{{ program.id }}">{{ program.name }}</a></td>
+                                        <td>
+                                            <button class="center-block" ng-click="loadProgram(program.id)" style="background-color: transparent; color: transparent;">
+                                                <i class="fa fa-play" style="color: greenyellow; background-color: transparent;"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="center-block" ng-click="stopProgram(program.id)" style="background-color: transparent; color: transparent;">
+                                                <i class="fa fa-stop" style="color: yellow; background-color: transparent;"></i>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <button class="center-block" ng-click="deleteProgram(program.id)"><b>x</b></button>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
             </div>
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -94,7 +106,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <button><i class="fa fa-plus" style="color: black; background-color: transparent;"></i></button>
+                        <button><i class="fa fa-plus" style="color: black; background-color: transparent;"></i>
+                        </button>
                     </div>
                     <div class="row">
                         <div class="table-responsive">
