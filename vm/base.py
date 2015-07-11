@@ -76,14 +76,22 @@ def periodic_eval(refresh_time_sec, program, should_stop, shared_val):
 
 class WorkerPool(object):
 
-    def __init__(self):
+    def __init__(self, data_connection):
         self.job_list = {}
         self.shared_val = multiprocessing.Value('i',0)
+        self.data_connection = data_connection
 
     def start_program(self, program_id, refresh_time_sec, program):
         if program_id not in self.job_list.keys():
             should_stop = multiprocessing.Value('b', False)
-            self.job_list[program_id] = [should_stop, multiprocessing.Process(target=periodic_eval, args=(refresh_time_sec, program, should_stop, self.shared_val))]
+            self.job_list[program_id] = [should_stop,
+                                         multiprocessing.Process(target=periodic_eval, args=(
+                                             refresh_time_sec,
+                                             program,
+                                             should_stop,
+                                             self.shared_val,
+                                             self.data_connection
+                                         ))]
             self.job_list[program_id][1].start()
         else:
             print "Program id {} already running".format(program_id)
@@ -153,7 +161,7 @@ if __name__ == '__main__':
     configurator = init_configurator()
     data_connection = DataConnection(configurator)
     data_connection.update_config(CONFIG_LOCATION)
-    worker_pool = WorkerPool()
+    worker_pool = WorkerPool(data_connection)
     command_handler = CommandHandler(worker_pool, data_connection)
 
     done = False
