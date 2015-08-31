@@ -1,6 +1,6 @@
 import json
 from django.test import LiveServerTestCase
-from robots.models import Command, LocalComputer, COMMAND_NOOP, Signal, System
+from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System
 from vm.base import Configurator
 from vm.data_connection import DataConnection
 import datetime
