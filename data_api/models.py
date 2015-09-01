@@ -20,6 +20,14 @@ class SystemModel(models.Model):
         abstract = True
 
 
+class Event(SystemModel):
+    group = models.ManyToManyField(Group)
+    type = models.CharField(max_length=32)
+    info = models.TextField(null=True)
+    local_computer = models.ForeignKey('LocalComputer', null=True)
+    system = models.ForeignKey('System', null=True)
+
+
 class System(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)

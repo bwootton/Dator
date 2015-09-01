@@ -4,7 +4,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from data_api.models import System, Program, Command, LocalComputer, Signal, Setting
+from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event
 
 
 class SystemResource(ModelResource):
@@ -87,4 +87,20 @@ class SettingResource(ModelResource):
             'system_id': ALL_WITH_RELATIONS
         }
 
+
+class EventResource(ModelResource):
+    local_computer_id = IntegerField(attribute="local_computer_id")
+    system_id = IntegerField(attribute="system_id", null=True)
+
+    class Meta:
+        queryset = Event.objects.all()
+        authorization = Authorization()
+        authentication = Authentication()
+        resource_name = 'event'
+        always_return_data = True
+
+        filtering = {
+            'local_computer_id': ALL_WITH_RELATIONS,
+            'system_id': ALL_WITH_RELATIONS
+        }
 
