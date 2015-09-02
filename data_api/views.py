@@ -9,12 +9,6 @@ from requests import Response
 from data_api.models import Signal, Blob
 
 
-def simple_view(request):
-    return render(request, 'simple_view.html')
-
-
-def root_view(request):
-    return render(request, 'root_view.html')
 
 def noop_view(request):
     c={}

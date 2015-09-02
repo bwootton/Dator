@@ -4,8 +4,8 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from tastypie.api import Api
 from data_api.api import *
-from data_api.views import simple_view, root_view, signal_data, blob_data, noop_view
-
+from data_api.views import signal_data, blob_data, noop_view
+from manage_ui.views import simple_view, root_view
 #admin.autodiscover()
 
 # tasty-pie definitions
