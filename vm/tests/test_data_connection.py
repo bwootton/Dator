@@ -1,6 +1,6 @@
 import json
 from django.test import LiveServerTestCase
-from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System
+from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System, Blob
 from vm.base import Configurator
 from vm.data_connection import DataConnection
 import datetime
@@ -37,12 +37,14 @@ class TestDataConnection(LiveServerTestCase):
         self.assertEqual(commands[0]['json_command'], json_command)
 
     def test_add_signal_points(self):
+        # with a signal and persisted data
         signal = Signal.objects.create(name='a_signal')
         n1 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC))
-        n2 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC) + datetime.datetime.timedelta(seconds=1))
-        json_data = json.dumps([[1, n1], [2, n2]])
-        self.data_connection.add_signal_points(signal.id)
+        n2 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=1))
+        json_data = [[1, n1], [2, n2]]
+        self.data_connection.add_signal_points(signal.id, json_data)
 
+        # should find persisted data
         points = signal.get_data()
         self.assertEqual(2, len(points))
         self.assertEqual(1,  points[0][0])
@@ -50,14 +52,25 @@ class TestDataConnection(LiveServerTestCase):
         self.assertAlmostEqual(n1, points[0][1], 2)
         self.assertAlmostEqual(n2, points[1][1], 2)
 
+        # should download points by id
+        downloaded_points = self.data_connection.get_signal_points(signal.id)
+        self.assertEqual(2, len(downloaded_points))
+        self.assertEqual(1,  downloaded_points[0][0])
+        self.assertEqual(2, downloaded_points[1][0])
+        self.assertAlmostEqual(n1, downloaded_points[0][1], 2)
+        self.assertAlmostEqual(n2, downloaded_points[1][1], 2)
+
+
     def test_add_signal_points_by_name(self):
+        # with a signal
         signal = Signal.objects.create(name='a_signal', local_computer=self.local_computer)
         n1 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC))
         n1 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC))
-        n2 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC) + datetime.datetime.timedelta(seconds=1))
-        json_data = json.dumps([[1, n1], [2, n2]])
-        self.data_connection.add_signal_points_by_name(signal.name)
+        n2 = Signal.utc_to_millisec(datetime.datetime.now(tz=pytz.UTC) + datetime.timedelta(seconds=1))
+        json_data = [[1, n1], [2, n2]]
+        self.data_connection.add_signal_points_by_name(signal.name, json_data)
 
+        # should find persisted data
         points = signal.get_data()
         self.assertEqual(2, len(points))
         self.assertEqual(1,  points[0][0])
@@ -65,5 +78,56 @@ class TestDataConnection(LiveServerTestCase):
         self.assertAlmostEqual(n1, points[0][1], 2)
         self.assertAlmostEqual(n2, points[1][1], 2)
 
+        # should download points by name
+        downloaded_points = self.data_connection.get_signal_points_by_name(signal.name)
+        self.assertEqual(2, len(downloaded_points))
+        self.assertEqual(1,  downloaded_points[0][0])
+        self.assertEqual(2, downloaded_points[1][0])
+        self.assertAlmostEqual(n1, downloaded_points[0][1], 2)
+        self.assertAlmostEqual(n2, downloaded_points[1][1], 2)
+
+    def test_add_blob(self):
+        # with a blob and uploaded data
+        blob = Blob.objects.create(name='another blob', local_computer=self.local_computer)
+        data = range(10,20)
+        blob_data = json.dumps(data)
+        self.data_connection.set_blob_data(blob.id, blob_data)
+
+        # server should persist the data
+        self.assertIsNotNone(blob.get_data())
+        self.assertSequenceEqual(json.loads(blob.get_data()), data)
+
+        # should download data
+        download_data = json.loads(self.data_connection.get_blob_data(blob.id))
+        self.assertSequenceEqual(download_data, data)
+
+    def test_add_blob_by_name(self):
+        # with a blob and uploaded data
+        blob = Blob.objects.create(name='another blob', local_computer=self.local_computer)
+        data = range(10,20)
+        blob_data = json.dumps(data)
+        self.data_connection.set_blob_data_by_name(blob.name, blob_data)
+
+        # server should persist the data
+        self.assertIsNotNone(blob.get_data())
+        self.assertSequenceEqual(json.loads(blob.get_data()), data)
+
+        # should download data
+        download_data = json.loads(self.data_connection.get_blob_data_by_name(blob.name))
+        self.assertSequenceEqual(download_data, data)
+
+    def test_get_or_create_signal(self):
+        # when creating a signal
+        json_signal = self.data_connection.get_or_create_signal("a signal")
+        # and looking it up in the db.
+        created_signal = Signal.objects.get(name="a signal")
+        # should create a signal
+        self.assertIsNotNone(created_signal)
+        # with proper id
+        self.assertEqual(json_signal['id'], created_signal.id)
+
+    def test_get_or_create_blob(self):
+        self.data_connection.get_or_create_blob("a blob")
+        self.assertIsNotNone(Blob.objects.get(name="a blob"))
 
 

@@ -1,7 +1,7 @@
 import json
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from data_api.models import System, Signal, LocalComputer
+from data_api.models import System, Signal, LocalComputer, Blob
 import django.utils.timezone as tmz
 
 
@@ -45,3 +45,34 @@ class TestViews(TestCase):
         self.assertEqual(2, points[1][0])
         self.assertAlmostEqual(n1, points[0][1], 2)
         self.assertAlmostEqual(n2, points[1][1], 2)
+
+    def test_get_blob(self):
+        # with a json blob
+        json_blob = Blob.objects.create(local_computer=self.local_computer, name='a_signal_blob')
+        # that has some data
+        data = [{'a': 1, 'b': [1, 2, 3]}, {'a': 4.0, 'b': 'a_string'}]
+        json_blob.set_data(json.dumps(data))
+
+        # should be able to get the data.
+        response = self.client.get(reverse('blob_data', args=(json_blob.id,)),content_type="application/octet-stream")
+        json_out = json.loads(response.content)
+        self.assertDictEqual(json_out[0], data[0])
+        self.assertDictEqual(json_out[1], data[1])
+
+    def test_post_blob(self):
+        # with a blob
+        json_blob = Blob.objects.create(local_computer=self.local_computer, name='a_signal_blob')
+        # when posting data.
+        data = [{'a': 1, 'b': [1, 2, 3]}, {'a': 4.0, 'b': 'a_string'}]
+        response = self.client.post(reverse('blob_data', args=(json_blob.id,)), data = json.dumps(data),
+                                    content_type="application/octet-stream")
+        # when we refresh the data
+        json_blob = Blob.objects.get(id=json_blob.id)
+        persisted_data = json_blob.get_data()
+        persisted_json = json.loads(persisted_data)
+
+        # we should get the same data out.
+        self.assertDictEqual(persisted_json[0], data[0])
+        self.assertDictEqual(persisted_json[1], data[1])
+
+

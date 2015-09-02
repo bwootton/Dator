@@ -1,10 +1,12 @@
 import json
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 
 # Create your views here.
-from data_api.models import Signal
+from django.template.context_processors import csrf
+from requests import Response
+from data_api.models import Signal, Blob
 
 
 def simple_view(request):
@@ -14,6 +16,35 @@ def simple_view(request):
 def root_view(request):
     return render(request, 'root_view.html')
 
+def noop_view(request):
+    c={}
+    c.update(csrf(request))
+    return render_to_response('noop.html', c)
+
+def blob_data(request, blob_id):
+    """
+    Set or get data for a json blob.
+    :param request:
+    :param blob_id:
+    :return:
+    """
+    try:
+        json_blob = Blob.objects.get(id=blob_id)
+    except Blob.DoesNotExist as e:
+        return HttpResponse({'status: failed - Blob requested does not exist.'}, status=404)
+    if request.method=='POST':
+        try:
+            json_blob.set_data(request.body)
+            response_dict={'status': 'succeeded'}
+            return HttpResponse(response_dict, status=200, content_type='application/json')
+        except BaseException as e:
+            return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
+    elif request.method == 'GET':
+        try:
+            body = json_blob.get_data()
+            return HttpResponse(body, status=200, content_type="application/octet-stream")
+        except BaseException as e:
+            return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
 
 def signal_data(request, signal_id):
     """

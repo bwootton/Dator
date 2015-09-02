@@ -21,6 +21,9 @@ class SystemModel(models.Model):
 
 
 class Event(SystemModel):
+    """
+    An event is used to record controller specific events for correlation with data signals.
+    """
     group = models.ManyToManyField(Group)
     type = models.CharField(max_length=32)
     info = models.TextField(null=True)
@@ -29,6 +32,9 @@ class Event(SystemModel):
 
 
 class System(SystemModel):
+    """
+    A system is a group of related LocalComputers that  coordinate actions and signals with each other.
+    """
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
     timezone = models.CharField(max_length=32)
@@ -36,10 +42,16 @@ class System(SystemModel):
 
 
 class Shift(SystemModel):
+    """
+    A Shift is used to record the beginning and the end of an experiment
+    """
     name = models.CharField(max_length=128)
-
+    ended_at = models.DateTimeField(null=True)
 
 class LocalComputer(SystemModel):
+    """
+    A LocalComputer system is a cpu capable of loading a program, recording data from sensors and operating actuators.
+    """
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
     registration_token = models.CharField(max_length=128)
@@ -49,18 +61,32 @@ class LocalComputer(SystemModel):
     is_running = models.BooleanField(default=False)
 
 
-COMMAND_NOOP=0
-COMMAND_DONE=1
-COMMAND_LOAD_PROGRAM=2
-COMMAND_STOP_PROGRAM=3
+# No-op
+COMMAND_NOOP = 0
+# shut down local_computer listener
+COMMAND_DONE = 1
+# load and start the indicated program on the local computer
+COMMAND_LOAD_PROGRAM = 2
+# stop the indicated program on the local computer
+COMMAND_STOP_PROGRAM = 3
+
 
 class Command(SystemModel):
+    """
+    Commands are enumerated json messages for LocalComputers.
+    When command has been successfully executed, the is_executed flag is set to True
+    """
     local_computer = models.ForeignKey('LocalComputer')
     type = models.IntegerField(default=COMMAND_NOOP, db_index=True)
     json_command = models.CharField(max_length="512", null=True)
     is_executed = models.BooleanField(default=False, db_index=True)
 
 class Program(SystemModel):
+    """
+    A loadable script/code file that can be run on a local computer.
+    A program will be run periodically with with a pause of the indicated
+    sleep_time between sucessive runs.
+    """
     group = models.ManyToManyField(Group)
     code = models.TextField(null=True)
     description = models.TextField(null=True)
@@ -68,6 +94,9 @@ class Program(SystemModel):
     sleep_time_sec = models.FloatField(default=1.0)
 
 class Map(SystemModel):
+    """
+    A map is a list of known signals with semantic meaning.
+    """
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128)
     controller = models.ForeignKey('LocalComputer')
@@ -77,6 +106,7 @@ SENSOR = 2
 
 
 class MapPoint(SystemModel):
+
     map = models.ForeignKey('Map')
     point_type = models.IntegerField(default=SENSOR)
     name = models.CharField(max_length=128)
@@ -85,8 +115,12 @@ class MapPoint(SystemModel):
 
 
 SIGNAL_PROVIDER = file_provider
+BLOB_PROVIDER = file_provider
 
 class Signal(SystemModel):
+    """
+    A time signal of floats.
+    """
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
@@ -125,10 +159,10 @@ class Signal(SystemModel):
         values, dates = self.get_data()
         return pd.TimeSeries(values, index=dates)
 
-
     def clear(self):
         SIGNAL_PROVIDER.startup()
         SIGNAL_PROVIDER.clear(self.uuid)
+
 
 class Setting(SystemModel):
     group = models.ManyToManyField(Group)
@@ -140,15 +174,21 @@ class Setting(SystemModel):
     def __unicode__(self):
         return '{},{}'.format(self.key, self.value)
 
-class BinaryBlob(SystemModel):
+
+class Blob(SystemModel):
     group = models.ManyToManyField(Group)
     name = models.CharField(max_length=128, db_index=True)
+    system = models.ForeignKey('System', null=True)
+    local_computer = models.ForeignKey('LocalComputer', null=True)
 
+    def get_data(self):
+        BLOB_PROVIDER.startup()
+        data = BLOB_PROVIDER.get_blob(self.uuid)
+        return data
 
-
-
-class SignalBlob(SystemModel):
-    signal = models.ForeignKey('Signal')
+    def set_data(self, json_data):
+        BLOB_PROVIDER.startup()
+        BLOB_PROVIDER.write_blob(self.uuid, json_data)
 
 @receiver(pre_save, sender=Command)
 @receiver(pre_save, sender=LocalComputer)
@@ -157,9 +197,13 @@ class SignalBlob(SystemModel):
 @receiver(pre_save, sender=Program)
 @receiver(pre_save, sender=Shift)
 @receiver(pre_save, sender=Signal)
-@receiver(pre_save, sender=SignalBlob)
 @receiver(pre_save, sender=System)
 @receiver(pre_save, sender=Setting)
+@receiver(pre_save, sender=Event)
+@receiver(pre_save, sender=Blob)
 def set_uuid(sender, instance, **kwargs):
+    """
+    Register all SystemModel derived classes to set uuid
+    """
     if not instance.uuid:
         instance.uuid = str(uuid4())

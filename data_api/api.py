@@ -4,7 +4,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event
+from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event, Blob
 
 
 class SystemResource(ModelResource):
@@ -70,6 +70,23 @@ class SignalResource(ModelResource):
             'name': 'eq'
         }
 
+
+class BlobResource(ModelResource):
+    local_computer_id = IntegerField(attribute="local_computer_id")
+    system_id = IntegerField(attribute="system_id", null=True)
+
+    class Meta:
+        queryset = Blob.objects.all()
+        authorization = Authorization()
+        authentication = Authentication()
+        resource_name = 'blob'
+        always_return_data = True
+
+        filtering = {
+            'local_computer_id': ALL_WITH_RELATIONS,
+            'system_id': ALL_WITH_RELATIONS,
+            'name': 'eq'
+        }
 
 class SettingResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
