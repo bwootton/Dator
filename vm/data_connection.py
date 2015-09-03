@@ -229,6 +229,14 @@ class DataConnection(object):
                                 headers=self.sec_header())
         return self.get_blob_data(json.loads(response.content)['objects'][0]['id'])
 
+    def create_event(self, event_type, info):
+        config = self.configurator.get_config()
+        url = self._api_url('event')
+        response = self.client.post(url, data=json.dumps({'type': event_type, 'info': info, 'local_computer_id': config['id']}),
+                                    headers=self.post_header())
+        if not self.check_response_ok(response):
+            print "Error creating event {}: {}".format(event_type, info)
+
     def sec_header(self, base_header=None):
         auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json'}
         if base_header is None:
@@ -238,6 +246,7 @@ class DataConnection(object):
     def post_header(self):
         auth_header = {'auth_key': self.configurator.get_config()["secret_uuid"], 'content-type': 'application/json', "X-CSRFToken": self.csrf}
         return auth_header
+
 
 
     @classmethod

@@ -118,6 +118,7 @@ class EventResource(ModelResource):
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
-            'system_id': ALL_WITH_RELATIONS
+            'system_id': ALL_WITH_RELATIONS,
+            'created_at': ['gte','lte','le','gt','eq']
         }
 

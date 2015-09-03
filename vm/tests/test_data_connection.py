@@ -1,6 +1,6 @@
 import json
 from django.test import LiveServerTestCase
-from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System, Blob
+from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System, Blob, Event
 from vm.base import Configurator
 from vm.data_connection import DataConnection
 import datetime
@@ -130,4 +130,6 @@ class TestDataConnection(LiveServerTestCase):
         self.data_connection.get_or_create_blob("a blob")
         self.assertIsNotNone(Blob.objects.get(name="a blob"))
 
-
+    def test_create_event(self):
+        self.data_connection.create_event("a type", "some text")
+        self.assertIsNotNone(Event.objects.get(type="a type", info="some text", local_computer=self.local_computer))
