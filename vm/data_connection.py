@@ -1,7 +1,9 @@
 import json
 import uuid
 import requests
-
+import datetime as tmz
+import pytz
+import delorean
 
 class DataConnection(object):
 
@@ -267,4 +269,10 @@ class DataConnection(object):
 
 
 
+    @classmethod
+    def millisec_to_utc(cls, millisec):
+        return tmz.datetime.fromtimestamp(float(millisec), tz=pytz.UTC)
 
+    @classmethod
+    def utc_to_millisec(cls, dt):
+        return delorean.Delorean(dt, timezone="UTC").epoch()
