@@ -22,17 +22,63 @@ The application is a standard Django Server 1.8 application using Python 2.7.x. 
 # API
 The server offers an RESFUL web api to store and retrieve sensor signals and actuation events: 
 
-* GET to view either a list **e.g. GET /api/v1/event/** or a single instance **e.g. GET /api/v1/event/15/** of an object 
-* POST to create an objects, **e.g. POST /api/v1/event/**
-* PUT to update, **e.g. PUT /api/v1/event/1/** 
-* DELETE to delete and obect **e.g. DELETE /api/v1/event/1/**.  
+* GET to view either a list of resource **e.g. GET /api/v1/event/** or a single resource **e.g. GET /api/v1/event/15/** 
+* POST to create a resource, **e.g. POST /api/v1/event/**
+* PUT to update a resource, **e.g. PUT /api/v1/event/1/** 
+* DELETE to delete a resource **e.g. DELETE /api/v1/event/1/**.  
  
 You can look at  /vm/data_connection.py to see examples of calling the server.
 
-Users register a computer instance before using most commands.  Registration returns a local_computer object with an id that is used to identfiy other API requests.
-## Endpoints
-### /api/v1/register/
-#### Filter parameters
+Users register a computer instance before using most commands.  Registration returns a local_computer resource with an id that is used to identfiy other API requests.
 
-#### Fields
+## Resource Endpoints
+### Global fields
+All resources include the following fields
+
+* UUID - a uniqe identifier chosen on creation
+* created_at - the UTC timestamp of creation of the resource
+* updated_at - the UTC timestamp the last modification of the resource
+
+### /api/v1/local_computer/?format=json
+The local computer resource tracks a single registered device. It's id is available as a filter for all other resource.
+#### Filter parameters
+None
+
+### /api/v1/event/?format=json
+An event is used to record the time of a notable event on the local_computer
+#### Filter parameters
+* local_computer_id
+* created_at
+
+### /api/v1/signal/?format=json
+A signal is a pointer to a floating point time series. A signal's data can be accessed or updated via the signal data api below.
+#### Filter parameters
+* local_computer_id
+
+### /api/v1/blob/?format=json
+A blob is a pointer to a blob of binary data.  A blob's data can be accessed or updated via the signal data api below.
+
+### /api/v1/command/?format=json
+A command signals a local_computer to take an action.  The vm app uses the command resource to indicate program load and stop requests.  Commands types are arbitrary and interpreted by the local_computer receiving them.
+#### Filter parameters
+* local_computer_id
+* is_executed - Set True if the command has been executed by the local computer.
+
+#### /api/v1/program/format=json
+A program resource tracks and optionally contains code to be loaded and run on the local_compputer
+#### Filter parameters
+* local_computer_id
+
+## Data endpoints
+POSTing data to blob and signal endpoints update the data in the related objects.   
+
+### /data_api/v1/signal/<signal_id>/
+
+POST data points to the signal to **append**.  Data should be JSON data in the body of the post and the content_type of the POST should be "application/json".  The format of the data  is [[<value1>, <seconds1>], [<value2>],[<seconds2>],...] 
+where value is a floating point number and seconds is floating point seconds since the epoch (Jan 1, 1970).  The data should be sorted in time-increasing order.
+
+GET will get **all** the data stored to a signal.
+
+### /data_api/v1/blob/<blob_id>/
+POST a blob of data to **overwrite** the data in the given blob. Data should be posted as "application/octet" data and will need to be string-encoded if it is binary data.
 
