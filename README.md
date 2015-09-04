@@ -39,35 +39,58 @@ All resources include the following fields
 * created_at - the UTC timestamp of creation of the resource
 * updated_at - the UTC timestamp the last modification of the resource
 
+---
 ### /api/v1/local_computer/?format=json
 The local computer resource tracks a single registered device. It's id is available as a filter for all other resource.
 #### Filter parameters
 None
 
+---
 ### /api/v1/event/?format=json
 An event is used to record the time of a notable event on the local_computer
 #### Filter parameters
 * local_computer_id
 * created_at
+#### Fields
+* type = models.CharField(max_length=32)
+* info = models.TextField
 
+---
 ### /api/v1/signal/?format=json
 A signal is a pointer to a floating point time series. A signal's data can be accessed or updated via the signal data api below.
 #### Filter parameters
 * local_computer_id
+#### Fields
+* name = models.CharField(max_length=128)
 
+---
 ### /api/v1/blob/?format=json
 A blob is a pointer to a blob of binary data.  A blob's data can be accessed or updated via the signal data api below.
+#### Filter parameters
+* local_computer_id
+#### Fields
+* name = models.CharField(max_length=128)
 
+---
 ### /api/v1/command/?format=json
 A command signals a local_computer to take an action.  The vm app uses the command resource to indicate program load and stop requests.  Commands types are arbitrary and interpreted by the local_computer receiving them.
 #### Filter parameters
 * local_computer_id
 * is_executed - Set True if the command has been executed by the local computer.
+#### Fields
+* type = models.IntegerField(default=COMMAND_NOOP)
+* json_command = models.CharField(max_length="512")
 
+---
 #### /api/v1/program/format=json
 A program resource tracks and optionally contains code to be loaded and run on the local_compputer
 #### Filter parameters
 * local_computer_id
+#### Fields
+* code = models.TextField(null=True)
+* description = models.TextField(null=True)
+* name = models.CharField(max_length=128)
+* sleep_time_sec = models.FloatField(default=1.0)
 
 ## Data endpoints
 POSTing data to blob and signal endpoints update the data in the related objects.   
@@ -79,6 +102,7 @@ where value is a floating point number and seconds is floating point seconds sin
 
 GET will get **all** the data stored to a signal.
 
+---
 ### /data_api/v1/blob/\<blob_id\>/
 POST a blob of data to **overwrite** the data in the given blob. Data should be posted as "application/octet" data and will need to be string-encoded if it is binary data.
 
