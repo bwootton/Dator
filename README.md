@@ -48,9 +48,11 @@ None
 ---
 ### /api/v1/event/?format=json
 An event is used to record the time of a notable event on the local_computer
+
 #### Filter parameters
 * local_computer_id
 * created_at
+
 #### Fields
 * type = models.CharField(max_length=32)
 * info = models.TextField
@@ -60,23 +62,28 @@ An event is used to record the time of a notable event on the local_computer
 A signal is a pointer to a floating point time series. A signal's data can be accessed or updated via the signal data api below.
 #### Filter parameters
 * local_computer_id
+
 #### Fields
 * name = models.CharField(max_length=128)
 
 ---
 ### /api/v1/blob/?format=json
 A blob is a pointer to a blob of binary data.  A blob's data can be accessed or updated via the signal data api below.
+
 #### Filter parameters
 * local_computer_id
+
 #### Fields
 * name = models.CharField(max_length=128)
 
 ---
 ### /api/v1/command/?format=json
 A command signals a local_computer to take an action.  The vm app uses the command resource to indicate program load and stop requests.  Commands types are arbitrary and interpreted by the local_computer receiving them.
+
 #### Filter parameters
 * local_computer_id
 * is_executed - Set True if the command has been executed by the local computer.
+
 #### Fields
 * type = models.IntegerField(default=COMMAND_NOOP)
 * json_command = models.CharField(max_length="512")
@@ -84,8 +91,10 @@ A command signals a local_computer to take an action.  The vm app uses the comma
 ---
 #### /api/v1/program/format=json
 A program resource tracks and optionally contains code to be loaded and run on the local_compputer
+
 #### Filter parameters
 * local_computer_id
+
 #### Fields
 * code = models.TextField(null=True)
 * description = models.TextField(null=True)
