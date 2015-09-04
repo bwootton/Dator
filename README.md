@@ -72,13 +72,13 @@ A program resource tracks and optionally contains code to be loaded and run on t
 ## Data endpoints
 POSTing data to blob and signal endpoints update the data in the related objects.   
 
-### /data_api/v1/signal/<signal_id>/
+### /data_api/v1/signal/\<signal_id\>/
 
 POST data points to the signal to **append**.  Data should be JSON data in the body of the post and the content_type of the POST should be "application/json".  The format of the data  is [[<value1>, <seconds1>], [<value2>],[<seconds2>],...] 
 where value is a floating point number and seconds is floating point seconds since the epoch (Jan 1, 1970).  The data should be sorted in time-increasing order.
 
 GET will get **all** the data stored to a signal.
 
-### /data_api/v1/blob/<blob_id>/
+### /data_api/v1/blob/\<blob_id\>/
 POST a blob of data to **overwrite** the data in the given blob. Data should be posted as "application/octet" data and will need to be string-encoded if it is binary data.
 
