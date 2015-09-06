@@ -19,7 +19,6 @@ class SystemModel(models.Model):
     class Meta:
         abstract = True
 
-
 class Event(SystemModel):
     """
     An event is used to record controller specific events for correlation with data signals.
@@ -30,6 +29,8 @@ class Event(SystemModel):
     local_computer = models.ForeignKey('LocalComputer', null=True)
     system = models.ForeignKey('System', null=True)
 
+    def __unicode__(self):
+        return "{}:{}".format(self.local_computer_id, self.type)
 
 class System(SystemModel):
     """
@@ -40,6 +41,8 @@ class System(SystemModel):
     timezone = models.CharField(max_length=32)
     shifts = models.ManyToManyField('Shift')
 
+    def __unicode__(self):
+        return self.name
 
 class Shift(SystemModel):
     """
@@ -60,6 +63,8 @@ class LocalComputer(SystemModel):
     command_refresh_sec = models.IntegerField(default=10)
     is_running = models.BooleanField(default=False)
 
+    def __unicode__(self):
+        return self.name
 
 # No-op
 COMMAND_NOOP = 0
@@ -81,6 +86,9 @@ class Command(SystemModel):
     json_command = models.CharField(max_length="512", null=True)
     is_executed = models.BooleanField(default=False, db_index=True)
 
+    def __unicode__(self):
+        return "{}:{}:{}".format(self.local_computer_id, self.type, self.created_at)
+
 class Program(SystemModel):
     """
     A loadable script/code file that can be run on a local computer.
@@ -93,6 +101,9 @@ class Program(SystemModel):
     name = models.CharField(max_length=128)
     sleep_time_sec = models.FloatField(default=1.0)
 
+    def __unicode__(self):
+        return self.name
+
 class Map(SystemModel):
     """
     A map is a list of known signals with semantic meaning.
@@ -101,9 +112,11 @@ class Map(SystemModel):
     name = models.CharField(max_length=128)
     controller = models.ForeignKey('LocalComputer')
 
+    def __unicode__(self):
+        return self.name
+
 ACTUATOR = 1
 SENSOR = 2
-
 
 class MapPoint(SystemModel):
 
@@ -112,6 +125,9 @@ class MapPoint(SystemModel):
     name = models.CharField(max_length=128)
     path = models.CharField(max_length=128)
     controller = models.ForeignKey('LocalComputer')
+
+    def __unicode__(self):
+        return self.name
 
 
 SIGNAL_PROVIDER = file_provider
@@ -125,6 +141,9 @@ class Signal(SystemModel):
     name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
+
+    def __unicode__(self):
+        return self.name
 
     def add_points(self, data_points):
         """Add points to the signal
@@ -180,6 +199,9 @@ class Blob(SystemModel):
     name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
+
+    def __unicode__(self):
+        return self.name
 
     def get_data(self):
         BLOB_PROVIDER.startup()
