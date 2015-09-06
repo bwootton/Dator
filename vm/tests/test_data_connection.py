@@ -1,6 +1,6 @@
 import json
 from django.test import LiveServerTestCase
-from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System, Blob, Event
+from data_api.models import Command, LocalComputer, COMMAND_NOOP, Signal, System, Blob, Event, Setting
 from vm.base import Configurator
 from vm.data_connection import DataConnection
 import datetime
@@ -129,6 +129,21 @@ class TestDataConnection(LiveServerTestCase):
     def test_get_or_create_blob(self):
         self.data_connection.get_or_create_blob("a blob")
         self.assertIsNotNone(Blob.objects.get(name="a blob"))
+
+    def test_get_or_create_setting(self):
+        gain = self.data_connection.get_or_create_setting("gain")
+        self.assertIsNotNone(Setting.objects.get(key="gain", local_computer_id=self.local_computer.id))
+        self.assertEqual(gain['value'], "")
+
+    def test_set_setting(self):
+        Setting.objects.create(key="gain", local_computer_id=self.local_computer.id, value=1.0)
+        gain = self.data_connection.get_or_create_setting("gain")
+        self.assertEqual(float(gain['value']), 1.0)
+
+        self.data_connection.write_setting("gain", 2.0)
+        self.assertEqual(Setting.objects.get(key="gain", local_computer_id=self.local_computer.id).value, "2.0")
+        gain = self.data_connection.get_or_create_setting("gain")
+        self.assertEqual(gain['value'], "2.0")
 
     def test_create_event(self):
         self.data_connection.create_event("a type", "some text")

@@ -13,6 +13,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         return Restangular.one("local_computer", $routeParams.id).get().then(function (localComputer) {
             $scope.localComputer = localComputer;
             $scope.getSignals();
+            $scope.getSettings();
         }, function (reason) {
             alert("Couldn't load localComputer: " + reason);
         });
@@ -93,6 +94,18 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
                 $scope.signals = data;
         });
     };
+
+    /**
+     * Get a list of settings associated with the computer.
+     */
+    $scope.getSettings = function () {
+        return Restangular.all("setting").getList({format:'json', local_computer_id: $scope.localComputer.id}).
+            then(function (data){
+                $scope.settings = data;
+        });
+    };
+
+
 
     $scope.getComputer();
     $scope.getPrograms();

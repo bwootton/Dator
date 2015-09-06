@@ -77,6 +77,17 @@ A blob is a pointer to a blob of binary data.  A blob's data can be accessed or 
 * name = models.CharField(max_length=128)
 
 ---
+### /api/v1/setting/
+A string setting
+
+#### Filter parameters
+* local_computer_id
+
+#### Fields
+* key = models.CharField(max_length=128)
+* value = models.CharField(max_length=128)
+
+---
 ### /api/v1/command/
 A command signals a local_computer to take an action.  The vm app uses the command resource to indicate program load and stop requests.  Commands types are arbitrary and interpreted by the local_computer receiving them.
 

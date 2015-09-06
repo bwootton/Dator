@@ -59,7 +59,8 @@
                 </div>
                 <div class="panel-body">
                     <div class="row">
-                        <button ng-click="newProgram()"><i class="fa fa-plus" style="color: black; background-color: transparent;"></i></button>
+                        <button ng-click="newProgram()">
+                            <i class="fa fa-plus" style="color: black; background-color: transparent;"></i></button>
                     </div>
                     <div class="row">
                         <div>
@@ -124,7 +125,7 @@
                                     <td>{{ signal.name }}</td>
                                     <td>{{ signal.uuid }}</td>
                                     <td class="text-center">
-                                        <button  ng-click="displaySignal(signal.id)" style="text-align: center; background-color: transparent; color: transparent;">
+                                        <button ng-click="displaySignal(signal.id)" style="text-align: center; background-color: transparent; color: transparent;">
                                             <i class="fa fa-area-chart" style="color: greenyellow; background-color: transparent;"></i>
                                         </button>
                                     </td>
@@ -133,6 +134,33 @@
                                             <i class="fa fa-download" style="color: greenyellow; background-color: transparent;"> </i>
                                         </a>
                                     </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <div class="panel-title">Settings</div>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                <tr>
+                                    <th>Key</th>
+                                    <th>Value</th>
+                                    <th>UUID</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="setting in settings">
+                                    <td>{{ setting.key }}</td>
+                                    <td>{{ setting.value }}</td>
+                                    <td>{{ setting.uuid }}</td>
                                 </tr>
                                 </tbody>
                             </table>

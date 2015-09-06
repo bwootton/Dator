@@ -183,6 +183,33 @@ class DataConnection(object):
 
         return json.loads(response.content)['objects'][0]
 
+    def get_or_create_setting(self, key):
+        """
+        Get or create a setting object for this local computer
+        :param setting: Setting key
+        :return: The setting object dict.
+        """
+        config =self.configurator.get_config()
+        url = self._api_url('setting')
+        params = {'key': key, 'local_computer_id': config['id']}
+        response = self.client.get(url, data=params, headers=self.sec_header())
+        if len(json.loads(response.content)['objects']) == 0:
+            self.client.post(url, data=json.dumps(params), headers=self.post_header())
+            response = requests.get(url, data=params, headers=self.sec_header())
+
+        return json.loads(response.content)['objects'][0]
+
+    def write_setting(self, key, value):
+        config =self.configurator.get_config()
+        url = self._api_url('setting')
+        params = {'key': key, 'local_computer_id': config['id']}
+        response = self.client.get(url, data=params, headers=self.sec_header())
+
+        setting = json.loads(response.content)['objects'][0]
+        url = self._item_url("setting", setting['id'])
+        params['value'] = value
+        self.client.put(url, data=json.dumps(params), headers=self.post_header())
+
     def get_or_create_blob(self, blob_name):
         """
         Get or create a new blob object for this local computer
