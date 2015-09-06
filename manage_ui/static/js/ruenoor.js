@@ -31,6 +31,28 @@ var app = angular.module('Ruenoor', ['restangular', 'ngRoute', 'ui.ace'])
         $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
     });
 
+/**
+ * Use this directive along with ng-click to pop up a confirmation dialog before passing through the ng-click.
+ */
+app.directive('ngConfirmClick', [
+  function(){
+      return {
+          priority: -1,
+          restrict: 'A',
+          link: function (scope, element, attrs) {
+              element.bind('click', function (e) {
+                  if (attrs.confirmCondition === undefined || attrs.confirmCondition === "true") {
+                      var message = attrs.ngConfirmClick;
+                      if (message && !confirm(message)) {
+                          e.stopImmediatePropagation();
+                          e.preventDefault();
+                      }
+                  }
+              });
+          }
+      }
+  }
+]);
 //app.config(['$httpProvider', function ($httpProvider) {
 //    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
 //    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
