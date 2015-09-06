@@ -40,13 +40,13 @@ All resources include the following fields
 * updated_at - the UTC timestamp the last modification of the resource
 
 ---
-### /api/v1/local_computer/?format=json
+### /api/v1/local_computer/
 The local computer resource tracks a single registered device. It's id is available as a filter for all other resource.
 #### Filter parameters
 None
 
 ---
-### /api/v1/event/?format=json
+### /api/v1/event/
 An event is used to record the time of a notable event on the local_computer
 
 #### Filter parameters
@@ -58,7 +58,7 @@ An event is used to record the time of a notable event on the local_computer
 * info = models.TextField
 
 ---
-### /api/v1/signal/?format=json
+### /api/v1/signal/
 A signal is a pointer to a floating point time series. A signal's data can be accessed or updated via the signal data api below.
 #### Filter parameters
 * local_computer_id
@@ -67,7 +67,7 @@ A signal is a pointer to a floating point time series. A signal's data can be ac
 * name = models.CharField(max_length=128)
 
 ---
-### /api/v1/blob/?format=json
+### /api/v1/blob/
 A blob is a pointer to a blob of binary data.  A blob's data can be accessed or updated via the signal data api below.
 
 #### Filter parameters
@@ -77,7 +77,7 @@ A blob is a pointer to a blob of binary data.  A blob's data can be accessed or 
 * name = models.CharField(max_length=128)
 
 ---
-### /api/v1/command/?format=json
+### /api/v1/command/
 A command signals a local_computer to take an action.  The vm app uses the command resource to indicate program load and stop requests.  Commands types are arbitrary and interpreted by the local_computer receiving them.
 
 #### Filter parameters
@@ -89,7 +89,7 @@ A command signals a local_computer to take an action.  The vm app uses the comma
 * json_command = models.CharField(max_length="512")
 
 ---
-#### /api/v1/program/format=json
+#### /api/v1/program/
 A program resource tracks and optionally contains code to be loaded and run on the local_compputer
 
 #### Filter parameters

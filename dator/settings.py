@@ -29,6 +29,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# always return JSON for model objects
+TASTYPIE_DEFAULT_FORMATS = ['json']
 
 # Application definition
 

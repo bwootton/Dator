@@ -12,6 +12,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
     $scope.getComputer = function () {
         return Restangular.one("local_computer", $routeParams.id).get().then(function (localComputer) {
             $scope.localComputer = localComputer;
+            $scope.getSignals();
         }, function (reason) {
             alert("Couldn't load localComputer: " + reason);
         });
@@ -87,7 +88,10 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
      * Get a list of signals associated with the computer.
      */
     $scope.getSignals = function () {
-        return Restangular.all("signal")
+        return Restangular.all("signal").getList({format:'json', local_computer_id: $scope.localComputer.id}).
+            then(function (data){
+                $scope.signals = data;
+        });
     };
 
     $scope.getComputer();

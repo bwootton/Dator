@@ -1,3 +1,4 @@
+import json
 from tastypie.authentication import Authentication
 from tastypie.fields import IntegerField, DateTimeField, CharField, BooleanField
 from tastypie.resources import ModelResource
@@ -6,6 +7,17 @@ from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
 from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event, Blob
 
+from django.core.serializers.json import DjangoJSONEncoder
+from tastypie.serializers import Serializer
+
+class PrettyJSONSerializer(Serializer):
+    json_indent = 2
+
+    def to_json(self, data, options=None):
+        options = options or {}
+        data = self.to_simple(data, options)
+        return json.dumps(data, cls=DjangoJSONEncoder,
+                sort_keys=True, ensure_ascii=False, indent=self.json_indent)
 
 class SystemResource(ModelResource):
 
@@ -16,6 +28,7 @@ class SystemResource(ModelResource):
         resource_name = 'system'
         always_return_data = True
 
+        serializer = PrettyJSONSerializer()
 
 class ProgramResource(ModelResource):
 
@@ -26,6 +39,7 @@ class ProgramResource(ModelResource):
         resource_name = 'program'
         always_return_data = True
 
+        serializer = PrettyJSONSerializer()
 
 class CommandResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
@@ -41,7 +55,8 @@ class CommandResource(ModelResource):
             'local_computer_id': ALL_WITH_RELATIONS,
             'is_executed': ALL_WITH_RELATIONS
         }
-        
+
+        serializer = PrettyJSONSerializer()
 
 class LocalComputerResource(ModelResource):
 
@@ -52,6 +67,7 @@ class LocalComputerResource(ModelResource):
         resource_name = 'local_computer'
         always_return_data = True
 
+        serializer = PrettyJSONSerializer()
 
 class SignalResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
@@ -69,6 +85,8 @@ class SignalResource(ModelResource):
             'system_id': ALL_WITH_RELATIONS,
             'name': 'eq'
         }
+
+        serializer = PrettyJSONSerializer()
 
 
 class BlobResource(ModelResource):
@@ -88,6 +106,8 @@ class BlobResource(ModelResource):
             'name': 'eq'
         }
 
+        serializer = PrettyJSONSerializer()
+
 class SettingResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
@@ -104,6 +124,8 @@ class SettingResource(ModelResource):
             'system_id': ALL_WITH_RELATIONS
         }
 
+
+        serializer = PrettyJSONSerializer()
 
 class EventResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
@@ -122,3 +144,4 @@ class EventResource(ModelResource):
             'created_at': ['gte','lte','lt','gt','eq']
         }
 
+        serializer = PrettyJSONSerializer()
