@@ -138,7 +138,7 @@ class DataConnection(object):
         config = self.configurator.get_config()
 
         url = self._api_url('signal')
-        response = self.client.get(url, data={'name': signal_name, 'local_computer_id': config['id']},
+        response = self.client.get(url, params={'name': signal_name, 'local_computer_id': config['id']},
                                 headers=self.sec_header())
         signal_id = json.loads(response.content)['objects'][0]['id']
         self.add_signal_points(signal_id, signal_points)
@@ -163,7 +163,7 @@ class DataConnection(object):
         """
         config = self.configurator.get_config()
         url = self._api_url('signal')
-        response = self.client.get(url, data={'name': name, 'local_computer_id': config['id']},
+        response = self.client.get(url, params={'name': name, 'local_computer_id': config['id']},
                                 headers=self.sec_header())
         return self.get_signal_points(json.loads(response.content)['objects'][0]['id'])
 
@@ -176,10 +176,11 @@ class DataConnection(object):
         config =self.configurator.get_config()
         url = self._api_url('signal')
         params = {'name': signal_name, 'local_computer_id': config['id']}
-        response = self.client.get(url, data=params, headers=self.sec_header())
+
+        response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
             self.client.post(url, data=json.dumps(params), headers=self.post_header())
-            response = requests.get(url, data=params, headers=self.sec_header())
+            response = self.client.get(url, params=params, headers=self.sec_header())
 
         return json.loads(response.content)['objects'][0]
 
@@ -192,10 +193,10 @@ class DataConnection(object):
         config =self.configurator.get_config()
         url = self._api_url('setting')
         params = {'key': key, 'local_computer_id': config['id']}
-        response = self.client.get(url, data=params, headers=self.sec_header())
+        response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
             self.client.post(url, data=json.dumps(params), headers=self.post_header())
-            response = requests.get(url, data=params, headers=self.sec_header())
+            response = self.client.get(url, params=params, headers=self.sec_header())
 
         return json.loads(response.content)['objects'][0]
 
@@ -203,7 +204,7 @@ class DataConnection(object):
         config =self.configurator.get_config()
         url = self._api_url('setting')
         params = {'key': key, 'local_computer_id': config['id']}
-        response = self.client.get(url, data=params, headers=self.sec_header())
+        response = self.client.get(url, params=params, headers=self.sec_header())
 
         setting = json.loads(response.content)['objects'][0]
         url = self._item_url("setting", setting['id'])
@@ -219,10 +220,10 @@ class DataConnection(object):
         config =self.configurator.get_config()
         url = self._api_url('blob')
         params = {'name': blob_name, 'local_computer_id': config['id']}
-        response = requests.get(url, data=params, headers=self.sec_header())
+        response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
             response = self.client.post(url, data=json.dumps(params), headers=self.post_header())
-            response = self.client.get(url, data=params, headers=self.sec_header())
+            response = self.client.get(url, params=params, headers=self.sec_header())
 
         return json.loads(response.content)['objects'][0]
 
@@ -241,7 +242,7 @@ class DataConnection(object):
     def set_blob_data_by_name(self, name, blob_data):
         config = self.configurator.get_config()
         url = self._api_url('blob')
-        response = self.client.get(url, data={'name': name, 'local_computer_id': config['id']},
+        response = self.client.get(url, params={'name': name, 'local_computer_id': config['id']},
                                 headers=self.sec_header())
         self.set_blob_data(json.loads(response.content)['objects'][0]['id'], blob_data)
 
@@ -254,7 +255,7 @@ class DataConnection(object):
     def get_blob_data_by_name(self, name):
         config = self.configurator.get_config()
         url = self._api_url('blob')
-        response = self.client.get(url, data={'name': name, 'local_computer_id': config['id']},
+        response = self.client.get(url, params={'name': name, 'local_computer_id': config['id']},
                                 headers=self.sec_header())
         return self.get_blob_data(json.loads(response.content)['objects'][0]['id'])
 

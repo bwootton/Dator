@@ -148,3 +148,9 @@ class TestDataConnection(LiveServerTestCase):
     def test_create_event(self):
         self.data_connection.create_event("a type", "some text")
         self.assertIsNotNone(Event.objects.get(type="a type", info="some text", local_computer=self.local_computer))
+
+    def test_create_multiple_signals(self):
+        signal1 = self.data_connection.get_or_create_signal("signal1")
+        self.assertEqual(signal1['id'], Signal.objects.get(name="signal1", local_computer=self.local_computer).id)
+        signal2 = self.data_connection.get_or_create_signal("signal2")
+        self.assertEqual(signal2['id'], Signal.objects.get(name="signal2", local_computer=self.local_computer).id)

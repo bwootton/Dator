@@ -60,6 +60,8 @@ class CommandResource(ModelResource):
 
 class LocalComputerResource(ModelResource):
 
+    name = CharField(attribute="name", null=True)
+
     class Meta:
         queryset = LocalComputer.objects.all()
         authorization = Authorization()
@@ -69,9 +71,14 @@ class LocalComputerResource(ModelResource):
 
         serializer = PrettyJSONSerializer()
 
+        filtering = {
+            'name':  ALL_WITH_RELATIONS
+        }
+
 class SignalResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
+    name = CharField(attribute="name", null=True)
 
     class Meta:
         queryset = Signal.objects.all()
@@ -82,8 +89,7 @@ class SignalResource(ModelResource):
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
-            'system_id': ALL_WITH_RELATIONS,
-            'name': 'eq'
+            'name': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
@@ -92,6 +98,7 @@ class SignalResource(ModelResource):
 class BlobResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
+    name = CharField(attribute="name", null=True)
 
     class Meta:
         queryset = Blob.objects.all()
@@ -103,7 +110,7 @@ class BlobResource(ModelResource):
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
             'system_id': ALL_WITH_RELATIONS,
-            'name': 'eq'
+            'name': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
@@ -121,7 +128,8 @@ class SettingResource(ModelResource):
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
-            'system_id': ALL_WITH_RELATIONS
+            'system_id': ALL_WITH_RELATIONS,
+            'key': ALL_WITH_RELATIONS
         }
 
 

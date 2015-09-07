@@ -1,6 +1,6 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from data_api.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal, Setting, Event
+from data_api.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal, Setting, Event, Blob
 from django.utils.timezone import now
 import json
 
@@ -48,6 +48,13 @@ class TestAPIWithLocalComputer(TestCase):
     def setUp(self):
         self.local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
 
+    def test_filter_local_computer_by_name(self):
+        # should get the command
+        url = reverse('api_dispatch_list', kwargs={'resource_name': 'local_computer', 'api_name': 'v1'})
+        response = self.client.get(url, data={'name': self.local_computer.name})
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], self.local_computer .id)
+
     def test_filter_commands_by_local_computer(self):
         # with a local computer that has a command
         Command.objects.create(local_computer=self.local_computer )
@@ -82,24 +89,40 @@ class TestAPIWithLocalComputer(TestCase):
         self.assertEquals(r_data[0]['json_command'], '["is executed"]')
 
 
-    def test_filter_signal_by_local_computer(self):
-        # with a signal
+    def test_filter_signal(self):
+        # with two signals
         signal = Signal.objects.create(local_computer=self.local_computer, name="a_signal")
+        signal2 = Signal.objects.create(local_computer=self.local_computer, name="another_signal")
         url = reverse('api_dispatch_list', kwargs={'resource_name': 'signal', 'api_name': 'v1'})
 
         # should get signal by local_computer
-        response = self.client.get(url, data={'local_computer_id':self.local_computer.id})
+        response = self.client.get(url, data={'local_computer_id': self.local_computer.id})
         r_data = json.loads(response.content)['objects']
+        self.assertEquals(len(r_data), 2)
         self.assertEquals(r_data[0]['id'], signal.id)
 
-    def test_filter_setting_by_local_computer(self):
+        # should get single signal by name
+        response = self.client.get(url, data={'name': signal.name, 'local_computer_id': self.local_computer.id})
+        r_data = json.loads(response.content)['objects']
+        self.assertEqual(len(r_data), 1)
+        self.assertEquals(r_data[0]['id'], signal.id)
+
+
+    def test_filter_setting(self):
         # with a setting
         setting = Setting.objects.create(local_computer=self.local_computer, key="a_signal", value="hello")
         url = reverse('api_dispatch_list', kwargs={'resource_name': 'setting', 'api_name': 'v1'})
 
+        # should get setting by local computer id
         response = self.client.get(url, data={'local_computer_id': self.local_computer.id})
         r_data = json.loads(response.content)['objects']
         self.assertEquals(r_data[0]['id'], setting.id)
+
+        # should get setting by name
+        response = self.client.get(url, data={'key': setting.key})
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], setting.id)
+
 
     def test_filter_event_by_local_computer_and_time(self):
         # with an event
@@ -114,3 +137,18 @@ class TestAPIWithLocalComputer(TestCase):
         r_data = json.loads(response.content)['objects']
         self.assertEquals(len(r_data), 1)
         self.assertEquals(r_data[0]['id'], event2.id)
+
+    def test_filter_blob(self):
+        # with a blob
+        blob = Blob.objects.create(local_computer=self.local_computer, name="a_blob")
+        url = reverse('api_dispatch_list', kwargs={'resource_name': 'blob', 'api_name': 'v1'})
+
+        # should get blob by local_computer
+        response = self.client.get(url, data={'local_computer_id':self.local_computer.id})
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], blob.id)
+
+        # should get blob by name
+        response = self.client.get(url, data={'name': blob.name})
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], blob.id)
