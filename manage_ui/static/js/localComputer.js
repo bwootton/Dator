@@ -1,4 +1,4 @@
-function LocalComputer($scope, $routeParams, $interval, Restangular) {
+function LocalComputer($scope, $routeParams, $interval, Restangular, $location) {
 
     $scope.saveComputer = function () {
         $scope.localComputer.save().then(function (computer) {
@@ -139,7 +139,11 @@ function LocalComputer($scope, $routeParams, $interval, Restangular) {
         });
     };
 
+    $scope.displaySignal =function(signalId){
+        $location.path("/signal_graph/" + $routeParams.id + "/" + signalId);
+    };
+
 }
 
 angular.module('Ruenoor').controller('LocalComputer',
-    ['$scope', '$routeParams', '$interval', 'Restangular', LocalComputer]);
+    ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', LocalComputer]);

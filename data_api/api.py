@@ -5,7 +5,7 @@ from tastypie.resources import ModelResource
 from tastypie.authorization import Authorization
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie import fields
-from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event, Blob
+from data_api.models import System, Program, Command, LocalComputer, Signal, Setting, Event, Blob, Experiment
 
 from django.core.serializers.json import DjangoJSONEncoder
 from tastypie.serializers import Serializer
@@ -79,6 +79,7 @@ class SignalResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
     name = CharField(attribute="name", null=True)
+    experiment_id = IntegerField(attribute="experiment_id", null=True)
 
     class Meta:
         queryset = Signal.objects.all()
@@ -89,7 +90,8 @@ class SignalResource(ModelResource):
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
-            'name': ALL_WITH_RELATIONS
+            'name': ALL_WITH_RELATIONS,
+            'experiment_id': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
@@ -99,6 +101,7 @@ class BlobResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
     name = CharField(attribute="name", null=True)
+    experiment_id = IntegerField(attribute="experiment_id", null=True)
 
     class Meta:
         queryset = Blob.objects.all()
@@ -110,7 +113,8 @@ class BlobResource(ModelResource):
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
             'system_id': ALL_WITH_RELATIONS,
-            'name': ALL_WITH_RELATIONS
+            'name': ALL_WITH_RELATIONS,
+            'experiment_id': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
@@ -118,6 +122,7 @@ class BlobResource(ModelResource):
 class SettingResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
+    experiment_id = IntegerField(attribute="experiment_id", null=True)
 
     class Meta:
         queryset = Setting.objects.all()
@@ -129,15 +134,16 @@ class SettingResource(ModelResource):
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
             'system_id': ALL_WITH_RELATIONS,
-            'key': ALL_WITH_RELATIONS
+            'key': ALL_WITH_RELATIONS,
+            'experiment_id': ALL_WITH_RELATIONS
         }
-
 
         serializer = PrettyJSONSerializer()
 
 class EventResource(ModelResource):
     local_computer_id = IntegerField(attribute="local_computer_id")
     system_id = IntegerField(attribute="system_id", null=True)
+    experiment_id = IntegerField(attribute="experiment_id", null=True)
 
     class Meta:
         queryset = Event.objects.all()
@@ -149,7 +155,24 @@ class EventResource(ModelResource):
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,
             'system_id': ALL_WITH_RELATIONS,
-            'created_at': ['gte','lte','lt','gt','eq']
+            'created_at': ['gte','lte','lt','gt','eq'],
+            'experiment_id': ALL_WITH_RELATIONS,
+            'type': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
+
+class ExperimentResource(ModelResource):
+
+
+    class Meta:
+        Queryset = Experiment.objects.all()
+        authorization = Authorization()
+        authentication = Authentication()
+        resource_name = 'experiment'
+        filtering = {
+            'name': ALL_WITH_RELATIONS
+        }
+        always_return_data = True
+
+    serializer = PrettyJSONSerializer()

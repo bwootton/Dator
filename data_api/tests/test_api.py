@@ -1,6 +1,8 @@
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from data_api.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal, Setting, Event, Blob
+import pytz
+from data_api.models import System, Program, SystemModel, Map, LocalComputer, Command, Signal, Setting, Event, Blob, \
+    Experiment
 from django.utils.timezone import now
 import json
 
@@ -11,7 +13,7 @@ class TestAPI(TestCase):
 
         # when creating a System
         self.system = System.objects.create(name="a_name")
-        #
+
 
     def test_get_system(self):
         # should get the system
@@ -46,7 +48,9 @@ class TestAPI(TestCase):
 class TestAPIWithLocalComputer(TestCase):
 
     def setUp(self):
+        start = now().astimezone(pytz.UTC)
         self.local_computer = LocalComputer.objects.create(name="a_name", registration_token= 'a_token')
+        self.experiment = Experiment.objects.create(name="a_experiment", started_at=start)
 
     def test_filter_local_computer_by_name(self):
         # should get the command
@@ -140,7 +144,7 @@ class TestAPIWithLocalComputer(TestCase):
 
     def test_filter_blob(self):
         # with a blob
-        blob = Blob.objects.create(local_computer=self.local_computer, name="a_blob")
+        blob = Blob.objects.create(local_computer=self.local_computer, name="a_blob", experiment=self.experiment)
         url = reverse('api_dispatch_list', kwargs={'resource_name': 'blob', 'api_name': 'v1'})
 
         # should get blob by local_computer
@@ -150,5 +154,10 @@ class TestAPIWithLocalComputer(TestCase):
 
         # should get blob by name
         response = self.client.get(url, data={'name': blob.name})
+        r_data = json.loads(response.content)['objects']
+        self.assertEquals(r_data[0]['id'], blob.id)
+
+        # should get blob by experiment
+        response = self.client.get(url, data={ 'experiment_id': self.experiment.id})
         r_data = json.loads(response.content)['objects']
         self.assertEquals(r_data[0]['id'], blob.id)

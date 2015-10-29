@@ -28,6 +28,7 @@ class Event(SystemModel):
     info = models.TextField(null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
     system = models.ForeignKey('System', null=True)
+    experiment = models.ForeignKey('Experiment', null=True)
 
     def __unicode__(self):
         return "{}:{}".format(self.local_computer_id, self.type)
@@ -141,6 +142,7 @@ class Signal(SystemModel):
     name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
+    experiment = models.ForeignKey('Experiment', null=True)
 
     def __unicode__(self):
         return self.name
@@ -189,6 +191,7 @@ class Setting(SystemModel):
     value = models.CharField(max_length=128)
     local_computer = models.ForeignKey('LocalComputer', null=True)
     system = models.ForeignKey('System', null=True)
+    experiment = models.ForeignKey('Experiment', null=True)
 
     def __unicode__(self):
         return '{},{}'.format(self.key, self.value)
@@ -199,6 +202,7 @@ class Blob(SystemModel):
     name = models.CharField(max_length=128, db_index=True)
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
+    experiment = models.ForeignKey('Experiment', null=True)
 
     def __unicode__(self):
         return self.name
@@ -212,6 +216,15 @@ class Blob(SystemModel):
         BLOB_PROVIDER.startup()
         BLOB_PROVIDER.write_blob(self.uuid, json_data)
 
+class Experiment(SystemModel):
+    group = models.ManyToManyField(Group)
+    started_at = models.DateTimeField(null=True)
+    ended_at = models.DateTimeField(null=True)
+    name = models.CharField(max_length=128, db_index=True)
+
+    def __unicode__(self):
+        return u"{}-{}-{}".format(self.name, self.started_at, self.ended_at)
+
 @receiver(pre_save, sender=Command)
 @receiver(pre_save, sender=LocalComputer)
 @receiver(pre_save, sender=Map)
@@ -223,6 +236,7 @@ class Blob(SystemModel):
 @receiver(pre_save, sender=Setting)
 @receiver(pre_save, sender=Event)
 @receiver(pre_save, sender=Blob)
+@receiver(pre_save, sender=Experiment)
 def set_uuid(sender, instance, **kwargs):
     """
     Register all SystemModel derived classes to set uuid

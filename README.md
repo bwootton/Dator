@@ -46,22 +46,41 @@ The local computer resource tracks a single registered device. It's id is availa
 None
 
 ---
+#### /api/v1/experiment
+An experiment has a start and end date and is used to identify signals collected when a certain experiment or 
+control regime is in effect.
+
+#### Filter parameters
+* name
+
+#### Fields
+* name 
+* started_at
+* ended_at
+* experiment_id
+
+---
 ### /api/v1/event/
 An event is used to record the time of a notable event on the local_computer
 
 #### Filter parameters
 * local_computer_id
 * created_at
+* type
+* experiment_id
 
 #### Fields
 * type = models.CharField(max_length=32)
 * info = models.TextField
+* experiment_id 
 
 ---
 ### /api/v1/signal/
 A signal is a pointer to a floating point time series. A signal's data can be accessed or updated via the signal data api below.
+
 #### Filter parameters
 * local_computer_id
+* experiment_id
 
 #### Fields
 * name = models.CharField(max_length=128)
@@ -72,6 +91,8 @@ A blob is a pointer to a blob of binary data.  A blob's data can be accessed or 
 
 #### Filter parameters
 * local_computer_id
+* experiment_id
+* name
 
 #### Fields
 * name = models.CharField(max_length=128)
@@ -82,6 +103,9 @@ A string setting
 
 #### Filter parameters
 * local_computer_id
+* experiment_id
+* key
+
 
 #### Fields
 * key = models.CharField(max_length=128)
@@ -101,7 +125,7 @@ A command signals a local_computer to take an action.  The vm app uses the comma
 
 ---
 #### /api/v1/program/
-A program resource tracks and optionally contains code to be loaded and run on the local_compputer
+A program resource tracks and optionally contains code to be loaded and run on the local_computer
 
 #### Filter parameters
 * local_computer_id
@@ -111,6 +135,8 @@ A program resource tracks and optionally contains code to be loaded and run on t
 * description = models.TextField(null=True)
 * name = models.CharField(max_length=128)
 * sleep_time_sec = models.FloatField(default=1.0)
+
+
 
 ## Data endpoints
 POSTing data to blob and signal endpoints update the data in the related objects.   
