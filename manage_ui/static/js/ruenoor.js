@@ -1,4 +1,4 @@
-var app = angular.module('Ruenoor', ['restangular', 'ngRoute', 'ui.ace'])
+var app = angular.module('Ruenoor', [ 'restangular', 'ngRoute', 'ui.ace'])
     .config(function (RestangularProvider, $routeProvider, $httpProvider) {
 
         // set routes
@@ -8,6 +8,8 @@ var app = angular.module('Ruenoor', ['restangular', 'ngRoute', 'ui.ace'])
             templateUrl: '/static/templates/local_computer.html'
         }).when('/', {
             templateUrl: '/static/templates/main.html'
+        }).when('/signal_graph/:local_computer_id/:signal_id', {
+            templateUrl: '/static/templates/signal_graph.html'
         });
 
         // configure restangular to work with tastypie, which returns data in an objects list, meta data in a meta object
