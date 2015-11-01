@@ -1,5 +1,5 @@
 from django.test import TestCase
-from data_api.models import System, Signal
+from data_api.models import System, Signal, LocalComputer
 import django.utils.timezone as tmz
 import pytz
 import delorean
@@ -64,3 +64,15 @@ class TestModel(TestCase):
         n1_ms = Signal.utc_to_millisec(n1)
         n1_back = Signal.millisec_to_utc(n1_ms)
         self.assertEqual(n1, n1_back)
+
+    def test_create_local_computer(self):
+        lc = LocalComputer.objects.create()
+        self.assertIsNotNone(lc.user)
+        self.assertIsNotNone(lc.group)
+        self.assertEqual(lc.group.filter(user__in=[lc.user]).count(),1)
+
+        lc2 = LocalComputer.objects.create()
+        # different computers should not be in each other's groups.
+        self.assertNotEqual(lc.group.filter(user__in=[lc.user]), lc2.group.filter(user__in=[lc2.user]))
+        self.assertEqual(lc2.group.filter(user__in=[lc.user]).count(), 0)
+        self.assertEqual(lc.group.filter(user__in=[lc2.user]).count(), 0)
