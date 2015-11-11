@@ -1,4 +1,5 @@
 from django.test import TestCase
+import math
 from data_api.models import System, Signal, LocalComputer
 import django.utils.timezone as tmz
 import pytz
@@ -41,6 +42,46 @@ class TestModel(TestCase):
         self.assertEqual(2, points[1][0])
         self.assertAlmostEqual(n1, points[0][1],2)
         self.assertAlmostEqual(n2, points[1][1],2)
+
+    def test_add_multivalue_points(self):
+        signal = Signal.objects.create(system=self.system,
+                                       name='a_signal')
+        n1 = Signal.utc_to_millisec(tmz.now())
+        n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
+
+        signal.add_points([[1.0, 2.0, n1],[3.0, float('nan'), n2]])
+
+        points = signal.get_data()
+        self.assertEqual(2, len(points))
+
+        self.assertEqual(3, len(points[0]))
+        self.assertEqual(2.0, points[0][1])
+        self.assertAlmostEqual(n1, points[0][2],2)
+
+        self.assertEqual(3, len(points[1]))
+        self.assertTrue(math.isnan(points[1][1]))
+        self.assertAlmostEqual(n2, points[1][2], 2)
+
+    def test_append_multivalue_points(self):
+        signal = Signal.objects.create(system=self.system,
+                                       name='a_signal')
+        n1 = Signal.utc_to_millisec(tmz.now())
+        n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
+
+        signal.add_points([[1.0, 2.0, n1]])
+        signal.add_points([[3.0, float('nan'), n2]])
+
+        points = signal.get_data()
+        self.assertEqual(2, len(points))
+
+        self.assertEqual(3, len(points[0]))
+        self.assertEqual(2.0, points[0][1])
+        self.assertAlmostEqual(n1, points[0][2],2)
+
+        self.assertEqual(3, len(points[1]))
+        self.assertTrue(math.isnan(points[1][1]))
+        self.assertAlmostEqual(n2, points[1][2], 2)
+
 
     def test_append_points(self):
         signal = Signal.objects.create(system=self.system,

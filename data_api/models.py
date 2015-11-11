@@ -148,13 +148,18 @@ class Signal(SystemModel):
     def __unicode__(self):
         return self.name
 
-    def add_points(self, data_points):
+    def add_points(self, frames):
         """Add points to the signal
-        :param data_points [[<float value>,<time in millisec>],...]
+        :param frames [[<float value>,<float value2>, <time in millisec>],...]
+        empty values must be formatted as nan
         """
         SIGNAL_PROVIDER.startup()
+        string_frames = []
+        for frame in frames:
+            string_frames.append('['+ ','.join(["{:.15}".format(float(datum)) for datum in frame]) + ']')
+
         SIGNAL_PROVIDER.append_data(self.uuid,
-                                    ''.join(["[{:.15},{:.15}]".format(float(datum[0]),float(datum[1])) for datum in data_points]))
+                                    ''.join([string_frame for string_frame in string_frames]))
 
 
     def get_data(self):
@@ -166,7 +171,7 @@ class Signal(SystemModel):
         for token in tokens:
             if token != '':
                 ts = token[1:].split(",")
-                points.append((float(ts[0]), float(ts[1])))
+                points+=[[float(t) for t in ts]]
         return points
 
     @classmethod
