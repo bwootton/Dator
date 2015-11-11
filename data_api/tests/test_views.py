@@ -12,7 +12,7 @@ class TestViews(TestCase):
 
         # when creating a System
         self.system = System.objects.create(name="a_name")
-        self.local_computer = LocalComputer.objects.create(name="local_computer")
+        self.local_computer = LocalComputer.objects.create(name="local_computer", secret_uuid="my_uuid")
         self.client = Client()
 
     def test_get_points(self):
