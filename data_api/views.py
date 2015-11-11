@@ -5,6 +5,7 @@ from django.shortcuts import render, render_to_response
 
 # Create your views here.
 from django.template.context_processors import csrf
+from django.views.decorators.csrf import csrf_exempt
 from requests import Response
 from data_api.models import Signal, Blob
 
@@ -15,6 +16,7 @@ def noop_view(request):
     c.update(csrf(request))
     return render_to_response('noop.html', c)
 
+@csrf_exempt
 def blob_data(request, blob_id):
     """
     Set or get data for a json blob.
@@ -32,7 +34,7 @@ def blob_data(request, blob_id):
             response_dict={'status': 'succeeded'}
             return HttpResponse(response_dict, status=200, content_type='application/json')
         except BaseException as e:
-            return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
+            return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
     elif request.method == 'GET':
         try:
             body = json_blob.get_data()
