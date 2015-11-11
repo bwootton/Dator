@@ -55,6 +55,27 @@ app.directive('ngConfirmClick', [
       }
   }
 ]);
+
+// user state labels for various services.
+var LOCAL_COMPUTER_STATE = "local_computer_state";
+
+function userStateService() {
+    self = this;
+    self.states = {};
+
+    self.initState = function(stateString, initObject)
+    {
+        if (self.states[stateString] == undefined)
+            self.states[stateString] = angular.copy(initObject);
+        return self.states[stateString];
+    };
+
+    self.getState = function(stateString){
+        return self.states(stateString);
+    }
+}
+
+app.service('UserStateService', [userStateService]);
 //app.config(['$httpProvider', function ($httpProvider) {
 //    $httpProvider.defaults.xsrfCookieName = 'csrftoken';
 //    $httpProvider.defaults.xsrfHeaderName = 'X-CSRFToken';
