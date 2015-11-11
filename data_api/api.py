@@ -151,6 +151,8 @@ class EventResource(ModelResource):
         authentication = Authentication()
         resource_name = 'event'
         always_return_data = True
+        max_limit=0
+        limit=1000
 
         filtering = {
             'local_computer_id': ALL_WITH_RELATIONS,

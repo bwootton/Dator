@@ -1,4 +1,31 @@
-function LocalComputer($scope, $routeParams, $interval, Restangular, $location) {
+function LocalComputer($scope, $routeParams, $interval, Restangular, $location, UserStateService) {
+
+    $scope.uiState= UserStateService.initState(
+        LOCAL_COMPUTER_STATE,
+        {
+            editComputer: false,
+            showPrograms: false,
+            programsCount: 0,
+            showSignals: false,
+            signalsCount: 0,
+            showSettings: false,
+            settingsCount: 0,
+            showEvents: false,
+            eventCount: 0,
+            showBlobs: false,
+            blobCount: 0,
+            experiment: 'All'
+        });
+
+    $scope.toggleStateClass =function(toggleVar){
+        if (toggleVar)
+            return "fa fa-minus-circle";
+        return "fa fa-plus-circle";
+    };
+
+    $scope.toggleVar = function(toggleVar ){
+        $scope.uiState[toggleVar] = !$scope.uiState[toggleVar];
+    };
 
     $scope.saveComputer = function () {
         $scope.localComputer.save().then(function (computer) {
@@ -14,6 +41,8 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location) 
             $scope.localComputer = localComputer;
             $scope.getSignals();
             $scope.getSettings();
+            $scope.getEvents();
+            $scope.getBlobs();
         }, function (reason) {
             alert("Couldn't load localComputer: " + reason);
         });
@@ -30,6 +59,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location) 
     $scope.getPrograms = function () {
         return Restangular.all("program").getList().then(function (programs) {
             $scope.programs = programs;
+            $scope.uiState.programsCount = programs.length;
         }, function (reason) {
             alert("Couldn't load programs: " + reason)
         });
@@ -92,6 +122,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location) 
         return Restangular.all("signal").getList({format:'json', local_computer_id: $scope.localComputer.id}).
             then(function (data){
                 $scope.signals = data;
+                $scope.uiState.signalsCount=data.length;
         });
     };
 
@@ -102,10 +133,31 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location) 
         return Restangular.all("setting").getList({format:'json', local_computer_id: $scope.localComputer.id}).
             then(function (data){
                 $scope.settings = data;
+                $scope.uiState.settingsCount = data.length;
         });
     };
 
 
+    /**
+     * Get a list of events associated with the computer.
+     */
+    $scope.getEvents = function () {
+        return Restangular.all("event").getList({format:'json', local_computer_id: $scope.localComputer.id}).
+            then(function (data){
+                $scope.events = data;
+                $scope.uiState.eventCount = data.length;
+        });
+    };
+    /**
+     * Get a list of blobs associated with the computer.
+     */
+    $scope.getBlobs = function(){
+        return Restangular.all("blob").getList({format:'json', local_computer_id: $scope.localComputer.id}).
+            then(function (data){
+                $scope.blobs = data;
+                $scope.uiState.blobCount=data.length;
+        });
+    };
 
     $scope.getComputer();
     $scope.getPrograms();
@@ -146,4 +198,4 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location) 
 }
 
 angular.module('Ruenoor').controller('LocalComputer',
-    ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', LocalComputer]);
+    ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', 'UserStateService', LocalComputer]);

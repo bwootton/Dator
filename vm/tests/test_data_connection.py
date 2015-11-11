@@ -60,6 +60,15 @@ class TestDataConnection(LiveServerTestCase):
         self.assertAlmostEqual(n1, downloaded_points[0][1], 2)
         self.assertAlmostEqual(n2, downloaded_points[1][1], 2)
 
+    def test_add_blob_data(self):
+        blob = Blob.objects.create(name="a_blob")
+        some_data = "ASDF ASDF ASDR e3airijqofwajOIEGHO34UOIUT290TJALKJDSJF"
+        self.data_connection.set_blob_data(blob.id, some_data)
+
+        new_data = self.data_connection.get_blob_data(blob.id)
+
+        self.assertEquals(some_data, new_data)
+
 
     def test_add_signal_points_by_name(self):
         # with a signal

@@ -235,7 +235,9 @@ class DataConnection(object):
         :return:
         """
         url = self._data_item_url('blob', id)
-        response = self.client.post(url, data=blob_data, headers=self.post_header())
+        headers = self.post_header()
+        headers['content-type'] = 'application/octet_stream'
+        response = self.client.post(url, data=blob_data, headers=headers)
         if not DataConnection.check_response_ok(response):
             print "Error posting blob data {}".format(response.content)
 
