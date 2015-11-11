@@ -1,6 +1,6 @@
 from uuid import uuid4
 from django.db import models
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from data_api import file_provider
@@ -57,6 +57,7 @@ class LocalComputer(SystemModel):
     A LocalComputer system is a cpu capable of loading a program, recording data from sensors and operating actuators.
     """
     group = models.ManyToManyField(Group)
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=128)
     registration_token = models.CharField(max_length=128)
     secret_uuid = models.CharField(max_length=128)
@@ -243,3 +244,23 @@ def set_uuid(sender, instance, **kwargs):
     """
     if not instance.uuid:
         instance.uuid = str(uuid4())
+
+@receiver(post_save, sender=LocalComputer)
+def add_group(sender, instance, **kwargs):
+    if instance.group.count()==0:
+        time_stamp = str(Signal.utc_to_millisec(tmz.now()))[0:20]
+        if len(instance.name) > 60:
+            name = instance.name[0:60] + time_stamp
+        else:
+            name = instance.name + time_stamp
+        group = Group.objects.create(name = name)
+        instance.group.add(group)
+    if instance.user is None:
+        time_stamp = str(Signal.utc_to_millisec(tmz.now()))[0:20]
+        if len(instance.name) > 60:
+            name = instance.name[0:60] + time_stamp
+        else:
+            name = instance.name + time_stamp
+        user = User.objects.create(username = name)
+        instance.group.all()[0].user_set.add(user)
+        instance.user = user
