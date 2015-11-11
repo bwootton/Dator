@@ -32,13 +32,23 @@ def blob_data(request, blob_id):
         try:
             json_blob.set_data(request.body)
             response_dict={'status': 'succeeded'}
+            if json_blob.content_type is None:
+                json_blob.content_type = 'application/json'
             return HttpResponse(response_dict, status=200, content_type='application/json')
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
     elif request.method == 'GET':
         try:
             body = json_blob.get_data()
-            return HttpResponse(body, status=200, content_type="application/octet-stream")
+
+            if json_blob.mime_type is None:
+                return HttpResponse(body, status=200, content_type="application/octet-stream")
+            else:
+                response = HttpResponse(body, status=200, content_type=json_blob.mime_type)
+                if json_blob.mime_type == 'image/jpeg':
+                    response['Content-Disposition'] = 'attachment; filename="{}.jpeg"'.format(json_blob.name)
+
+                return response
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
 

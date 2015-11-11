@@ -194,14 +194,16 @@
                                         <tr>
                                             <th>ID</th>
                                             <th>Name</th>
+                                            <th>Mime Type</th>
                                             <th>UUID</th>
-                                            <th class="text-center">Get JSON</th>
+                                            <th class="text-center">Get Blob</th>
                                         </tr>
                                         </thead>
                                         <tbody>
                                          <tr ng-repeat="blob in blobs">
                                             <td>{{ blob.id }}</td>
                                             <td>{{ blob.name }}</td>
+                                            <td>{{ blob.mime_type }}</td>
                                             <td>{{ blob.uuid }}</td>
 
                                             <td class="text-center">

@@ -209,6 +209,7 @@ class Blob(SystemModel):
     system = models.ForeignKey('System', null=True)
     local_computer = models.ForeignKey('LocalComputer', null=True)
     experiment = models.ForeignKey('Experiment', null=True)
+    mime_type = models.CharField(max_length=128, null=True, db_index=True)
 
     def __unicode__(self):
         return self.name
