@@ -107,13 +107,13 @@ class TestModel(TestCase):
         self.assertEqual(n1, n1_back)
 
     def test_create_local_computer(self):
-        lc = LocalComputer.objects.create()
+        lc = LocalComputer.objects.create(name="c1")
         self.assertIsNotNone(lc.user)
         self.assertIsNotNone(lc.group)
-        self.assertEqual(lc.group.filter(user__in=[lc.user]).count(),1)
+        self.assertIn(lc.user, lc.group.user_set.all())
 
-        lc2 = LocalComputer.objects.create()
+        lc2 = LocalComputer.objects.create(name="c2")
+
         # different computers should not be in each other's groups.
-        self.assertNotEqual(lc.group.filter(user__in=[lc.user]), lc2.group.filter(user__in=[lc2.user]))
-        self.assertEqual(lc2.group.filter(user__in=[lc.user]).count(), 0)
-        self.assertEqual(lc.group.filter(user__in=[lc2.user]).count(), 0)
+        self.assertNotIn(lc.user, lc2.group.user_set.all())
+        self.assertNotIn(lc2.user, lc.group.user_set.all())

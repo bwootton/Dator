@@ -1,4 +1,5 @@
 import json
+from django.contrib.auth.models import UserManager, User
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from data_api.models import System, Signal, LocalComputer, Blob
@@ -10,10 +11,33 @@ class TestViews(TestCase):
     def setUp(self):
         self.client = Client()
 
-        # when creating a System
+        # when creating a System and a Local Computer
         self.system = System.objects.create(name="a_name")
         self.local_computer = LocalComputer.objects.create(name="local_computer", secret_uuid="my_uuid")
+
+        # and a user
+        um = UserManager()
+        um.model = User
+        self.user = um.create_user("bob", "bob@test.com", "hello")
+
         self.client = Client()
+        self.client.login(username="bob", password="hello")
+
+    def test_claim_local_computer(self):
+        # with a registration_token
+        self.local_computer.registration_token = "hello bob"
+        self.local_computer.save()
+
+        # should fail to claim computer with wrong token
+        response = self.client.post(reverse('claim_local_computer', args=(self.local_computer.id,)),
+                                    data={'token': 'incorrect'})
+        self.assertEquals(403, response.status_code)
+
+        # should be able to claim computer
+        response = self.client.post(reverse('claim_local_computer', args=(self.local_computer.id,)),
+                                    data={'token': 'hello bob'})
+        self.assertEquals(200, response.status_code)
+        self.assertIn(self.local_computer.group, self.user.groups.all())
 
     def test_get_points(self):
         signal = Signal.objects.create(system=self.system, name='a_signal')

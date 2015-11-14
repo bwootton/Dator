@@ -56,7 +56,7 @@ class LocalComputer(SystemModel):
     """
     A LocalComputer system is a cpu capable of loading a program, recording data from sensors and operating actuators.
     """
-    group = models.ManyToManyField(Group)
+    group = models.ForeignKey(Group, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
     name = models.CharField(max_length=128)
     registration_token = models.CharField(max_length=128)
@@ -251,16 +251,16 @@ def set_uuid(sender, instance, **kwargs):
     if not instance.uuid:
         instance.uuid = str(uuid4())
 
-@receiver(post_save, sender=LocalComputer)
+@receiver(pre_save, sender=LocalComputer)
 def add_group(sender, instance, **kwargs):
-    if instance.group.count()==0:
+    if instance.group is None:
         time_stamp = str(Signal.utc_to_millisec(tmz.now()))[0:20]
         if len(instance.name) > 60:
             name = instance.name[0:60] + time_stamp
         else:
             name = instance.name + time_stamp
         group = Group.objects.create(name = name)
-        instance.group.add(group)
+        instance.group = group
     if instance.user is None:
         time_stamp = str(Signal.utc_to_millisec(tmz.now()))[0:20]
         if len(instance.name) > 60:
@@ -268,5 +268,5 @@ def add_group(sender, instance, **kwargs):
         else:
             name = instance.name + time_stamp
         user = User.objects.create(username = name)
-        instance.group.all()[0].user_set.add(user)
+        user.groups.add(instance.group)
         instance.user = user
