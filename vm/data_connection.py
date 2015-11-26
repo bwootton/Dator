@@ -291,7 +291,9 @@ class DataConnection(object):
         else:
             response_string = "WARNING Command lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
             if response.content:
-                response_string += response.content
+                response_string = response_string + "\n" + response.content
+            if response.reason:
+                response_string = response_string + "\n" + response.reason
             print response_string
             return False
 
