@@ -4,7 +4,7 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from tastypie.api import Api
 from data_api.api import *
-from data_api.views import signal_data, blob_data, noop_view
+from data_api.views import signal_data, blob_data, noop_view, claim_local_computer
 from manage_ui.views import simple_view, root_view
 #admin.autodiscover()
 
@@ -29,6 +29,7 @@ urlpatterns = [
         url(r'^signal/(?P<signal_id>\d+)/', signal_data, name='signal_data'),
         url(r'^blob/(?P<blob_id>\d+)/', blob_data, name='blob_data'),
     ])),
+    url(r'^claim_local_computer/(?P<local_computer_id>\d+)/', claim_local_computer, name='claim_local_computer'),
     url(r'^noop/', noop_view, name='NoopView'),
     url(r'^$', root_view, name='RootView')
 ]

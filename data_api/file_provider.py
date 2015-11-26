@@ -31,7 +31,7 @@ def get_blob(uuid):
 def write_blob(uuid, blob):
     lock = LockFile(file_name(uuid), timeout=10)
     with lock:
-        with open(file_name(uuid), "w") as input:
+        with open(file_name(uuid), "w+") as input:
             input.write(blob)
 
 def append_data(uuid, value):

@@ -4,6 +4,7 @@ from uuid import uuid4
 import multiprocessing
 import requests
 import time
+import sys
 from data_connection import DataConnection
 
 
@@ -41,11 +42,13 @@ class Configurator(object):
 CONFIG_LOCATION = "default.cfg"
 
 
-def init_configurator():
+def init_configurator(config_location=None):
     """
     Register local computer if not done previously.
     :return: The configurator for this local computer
     """
+
+    CONFIG_LOCATION=config_location
     if os.path.isfile(CONFIG_LOCATION):
         configurator = Configurator(filename=CONFIG_LOCATION)
         print "Found local configurator at {}".format(CONFIG_LOCATION)
@@ -154,11 +157,16 @@ class CommandHandler(object):
         self.worker_pool.stop_program(program['id'])
 
 
+
 if __name__ == '__main__':
     """
     Main loop.  Handle commands until done.
     """
-    configurator = init_configurator()
+    if len(sys.argv) != 2:
+        print "usage: python base <config file>"
+        sys.exit()
+
+    configurator = init_configurator(sys.argv[1])
     data_connection = DataConnection(configurator)
     data_connection.update_config(CONFIG_LOCATION)
     worker_pool = WorkerPool(data_connection)
@@ -166,10 +174,16 @@ if __name__ == '__main__':
 
     done = False
     data_connection.set_local_computer_status(is_running=True)
+    print "Connected to " + configurator.get_config()['server']
+    print "Polling for commands.  <ctrl-c> to exit."
     while not done:
-        commands = data_connection.get_new_commands()
-        done = command_handler.handle_commands(commands)
-        time.sleep(configurator.get_config()['command_refresh_sec'])
+        try:
+            commands = data_connection.get_new_commands()
+            done = command_handler.handle_commands(commands)
+            time.sleep(configurator.get_config()['command_refresh_sec'])
+        except KeyboardInterrupt:
+            print "Stopping"
+            done = True
 
     worker_pool.stop()
     data_connection.set_local_computer_status(is_running=False)

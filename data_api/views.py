@@ -7,8 +7,7 @@ from django.shortcuts import render, render_to_response
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from requests import Response
-from data_api.models import Signal, Blob
-
+from data_api.models import Signal, Blob, LocalComputer
 
 
 def noop_view(request):
@@ -34,7 +33,7 @@ def blob_data(request, blob_id):
             response_dict={'status': 'succeeded'}
             if json_blob.content_type is None:
                 json_blob.content_type = 'application/json'
-            return HttpResponse(response_dict, status=200, content_type='application/json')
+            return HttpResponse(json.dumps(response_dict), status=200, content_type='application/json')
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
     elif request.method == 'GET':
@@ -79,3 +78,24 @@ def signal_data(request, signal_id):
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
 
+def claim_local_computer(request, local_computer_id):
+    """
+    Add the claiming user to the local computer's access group.
+    :param request: A post request with the LocalComputer token in the parameters.
+    :param local_computer_id:
+    :return: HTTP Response containing a JSON status message
+    """
+    try:
+        local_computer = LocalComputer.objects.get(id=local_computer_id)
+        token = request.POST['token']
+        if local_computer.group.user_set.all().count() > 1:
+            # each local computer has a lc user already
+            return HttpResponse({'status': '403 - Computer already claimed'}, status=403)
+
+        if token == local_computer.registration_token:
+            request.user.groups.add(local_computer.group)
+            return HttpResponse({'status': '200 - Computer successfully claimed'}, status=200)
+        else:
+            return HttpResponse({'status': '403 - Wrong token presented to claim computer'}, status=403)
+    except Exception as e:
+        return HttpResponse({'status': "500 - unexpected error {}".format(e)}, status=500)

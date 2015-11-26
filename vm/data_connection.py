@@ -211,7 +211,7 @@ class DataConnection(object):
         params['value'] = value
         self.client.put(url, data=json.dumps(params), headers=self.post_header())
 
-    def get_or_create_blob(self, blob_name):
+    def get_or_create_blob(self, blob_name, content_type="application/json"):
         """
         Get or create a new blob object for this local computer
         :param blob_name:
@@ -222,7 +222,9 @@ class DataConnection(object):
         params = {'name': blob_name, 'local_computer_id': config['id']}
         response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
+            params['mime_type']=content_type
             response = self.client.post(url, data=json.dumps(params), headers=self.post_header())
+            params.pop('mime_type')
             response = self.client.get(url, params=params, headers=self.sec_header())
 
         return json.loads(response.content)['objects'][0]
@@ -291,7 +293,9 @@ class DataConnection(object):
         else:
             response_string = "WARNING Command lookup failed: status: {} reason: {}".format(response.status_code, response.reason)
             if response.content:
-                response_string += response.content
+                response_string = response_string + "\n" + response.content
+            if response.reason:
+                response_string = response_string + "\n" + response.reason
             print response_string
             return False
 
