@@ -47,8 +47,8 @@ def init_configurator(config_location=None):
     Register local computer if not done previously.
     :return: The configurator for this local computer
     """
-    if config_location is not None:
-        CONFIG_LOCATION=config_location
+
+    CONFIG_LOCATION=config_location
     if os.path.isfile(CONFIG_LOCATION):
         configurator = Configurator(filename=CONFIG_LOCATION)
         print "Found local configurator at {}".format(CONFIG_LOCATION)
@@ -166,8 +166,7 @@ if __name__ == '__main__':
         print "usage: python base <config file>"
         sys.exit()
 
-    CONFIG_LOCATION = sys.argv[1]
-    configurator = init_configurator()
+    configurator = init_configurator(sys.argv[1])
     data_connection = DataConnection(configurator)
     data_connection.update_config(CONFIG_LOCATION)
     worker_pool = WorkerPool(data_connection)
