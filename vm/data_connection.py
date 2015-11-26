@@ -219,10 +219,12 @@ class DataConnection(object):
         """
         config =self.configurator.get_config()
         url = self._api_url('blob')
-        params = {'name': blob_name, 'local_computer_id': config['id'], 'mime_type': content_type}
+        params = {'name': blob_name, 'local_computer_id': config['id']}
         response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
+            params['mime_type']=content_type
             response = self.client.post(url, data=json.dumps(params), headers=self.post_header())
+            params.pop('mime_type')
             response = self.client.get(url, params=params, headers=self.sec_header())
 
         return json.loads(response.content)['objects'][0]
