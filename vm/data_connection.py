@@ -211,7 +211,7 @@ class DataConnection(object):
         params['value'] = value
         self.client.put(url, data=json.dumps(params), headers=self.post_header())
 
-    def get_or_create_blob(self, blob_name):
+    def get_or_create_blob(self, blob_name, content_type="application/json"):
         """
         Get or create a new blob object for this local computer
         :param blob_name:
@@ -219,7 +219,7 @@ class DataConnection(object):
         """
         config =self.configurator.get_config()
         url = self._api_url('blob')
-        params = {'name': blob_name, 'local_computer_id': config['id']}
+        params = {'name': blob_name, 'local_computer_id': config['id'], 'content_type': content_type}
         response = self.client.get(url, params=params, headers=self.sec_header())
         if len(json.loads(response.content)['objects']) == 0:
             response = self.client.post(url, data=json.dumps(params), headers=self.post_header())
