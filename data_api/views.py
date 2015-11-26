@@ -31,8 +31,8 @@ def blob_data(request, blob_id):
         try:
             json_blob.set_data(request.body)
             response_dict={'status': 'succeeded'}
-            if json_blob.content_type is None:
-                json_blob.content_type = 'application/json'
+            if json_blob.mime_type is None:
+                json_blob.mime_type = 'application/json'
             return HttpResponse(json.dumps(response_dict), status=200, content_type='application/json')
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
