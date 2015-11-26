@@ -33,7 +33,7 @@ def blob_data(request, blob_id):
             response_dict={'status': 'succeeded'}
             if json_blob.content_type is None:
                 json_blob.content_type = 'application/json'
-            return HttpResponse(response_dict, status=200, content_type='application/json')
+            return HttpResponse(json.dumps(response_dict), status=200, content_type='application/json')
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
     elif request.method == 'GET':

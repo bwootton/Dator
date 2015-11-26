@@ -114,7 +114,8 @@ class BlobResource(ModelResource):
             'local_computer_id': ALL_WITH_RELATIONS,
             'system_id': ALL_WITH_RELATIONS,
             'name': ALL_WITH_RELATIONS,
-            'experiment_id': ALL_WITH_RELATIONS
+            'experiment_id': ALL_WITH_RELATIONS,
+            'mime_type': ALL_WITH_RELATIONS
         }
 
         serializer = PrettyJSONSerializer()
