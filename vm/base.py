@@ -155,6 +155,7 @@ class CommandHandler(object):
         self.worker_pool.stop_program(program['id'])
 
 
+
 if __name__ == '__main__':
     """
     Main loop.  Handle commands until done.
@@ -162,6 +163,7 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print "usage: python base <config file>"
         sys.exit()
+
     CONFIG_LOCATION = sys.argv[1]
     configurator = init_configurator()
     data_connection = DataConnection(configurator)
@@ -174,9 +176,13 @@ if __name__ == '__main__':
     print "Connected to " + configurator.get_config()['server']
     print "Polling for commands.  <ctrl-c> to exit."
     while not done:
-        commands = data_connection.get_new_commands()
-        done = command_handler.handle_commands(commands)
-        time.sleep(configurator.get_config()['command_refresh_sec'])
+        try:
+            commands = data_connection.get_new_commands()
+            done = command_handler.handle_commands(commands)
+            time.sleep(configurator.get_config()['command_refresh_sec'])
+        except KeyboardInterrupt:
+            print "Stopping"
+            done = True
 
     worker_pool.stop()
     data_connection.set_local_computer_status(is_running=False)
