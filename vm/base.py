@@ -4,6 +4,7 @@ from uuid import uuid4
 import multiprocessing
 import requests
 import time
+import sys
 from data_connection import DataConnection
 
 
@@ -158,6 +159,10 @@ if __name__ == '__main__':
     """
     Main loop.  Handle commands until done.
     """
+    if len(sys.argv) != 2:
+        print "usage: python base <config file>"
+        sys.exit()
+    CONFIG_LOCATION = sys.argv[1]
     configurator = init_configurator()
     data_connection = DataConnection(configurator)
     data_connection.update_config(CONFIG_LOCATION)
@@ -166,6 +171,8 @@ if __name__ == '__main__':
 
     done = False
     data_connection.set_local_computer_status(is_running=True)
+    print "Connected to " + configurator.get_config()['server']
+    print "Polling for commands.  <ctrl-c> to exit."
     while not done:
         commands = data_connection.get_new_commands()
         done = command_handler.handle_commands(commands)
