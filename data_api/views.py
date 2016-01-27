@@ -7,7 +7,7 @@ from django.shortcuts import render, render_to_response
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
 from requests import Response
-from data_api.models import Signal, Blob, LocalComputer
+from data_api.models import Signal, Blob, LocalComputer, Experiment, Setting
 
 
 def noop_view(request):
@@ -99,3 +99,19 @@ def claim_local_computer(request, local_computer_id):
             return HttpResponse({'status': '403 - Wrong token presented to claim computer'}, status=403)
     except Exception as e:
         return HttpResponse({'status': "500 - unexpected error {}".format(e)}, status=500)
+
+
+def clone_experiment(request, local_computer_id, source_experiment_id):
+
+    try:
+        if request.method == 'POST':
+            source_experiment = Experiment.objects.get(local_computer_id=local_computer_id, id=source_experiment_id)
+            if not 'name' in request.POST:
+                return HttpResponse({'status': "500 - HTTP GET not supported"}, status=500)
+            else:
+                experiment = source_experiment.clone(request.POST['name'])
+            return HttpResponse({'id': experiment.id}, status=200)
+        else:
+            return HttpResponse({'status': "500 - HTTP GET not supported"}, status=500)
+    except Exception as e:
+        return HttpResponse({'status': "500 - unexpected error {} {}".format(e, e.message)}, status=500)

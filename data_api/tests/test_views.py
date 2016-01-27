@@ -1,8 +1,8 @@
 import json
-from django.contrib.auth.models import UserManager, User
+from django.contrib.auth.models import UserManager, User, Group
 from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
-from data_api.models import System, Signal, LocalComputer, Blob
+from data_api.models import System, Signal, LocalComputer, Blob, Experiment, Setting
 import django.utils.timezone as tmz
 
 
@@ -22,6 +22,25 @@ class TestViews(TestCase):
 
         self.client = Client()
         self.client.login(username="bob", password="hello")
+
+    def test_experiment_clone(self):
+        # with an experiment
+        group = Group.objects.create(name="a_group")
+        experiment = Experiment.objects.create(name="an_experiment", local_computer=self.local_computer)
+        experiment.group.add(group)
+
+        # with settings, signals and blobs
+        Signal.objects.create(experiment=experiment, local_computer=self.local_computer, name="a_signal")
+
+        Blob.objects.create(experiment=experiment, local_computer=self.local_computer, name="a_blob",
+                                     mime_type="image/jpeg")
+        Setting.objects.create(experiment=experiment, local_computer=self.local_computer, key="key",
+                                         value="value")
+
+        response = self.client.post(reverse("CloneExperiment", args=(self.local_computer.id, experiment.id,)),
+                                    data={'name':'new_name'})
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Experiment.objects.filter(local_computer=self.local_computer, name="new_name").count(), 1)
 
     def test_claim_local_computer(self):
         # with a registration_token

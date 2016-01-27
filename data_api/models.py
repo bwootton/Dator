@@ -228,9 +228,36 @@ class Experiment(SystemModel):
     started_at = models.DateTimeField(null=True)
     ended_at = models.DateTimeField(null=True)
     name = models.CharField(max_length=128, db_index=True)
+    local_computer = models.ForeignKey(LocalComputer)
 
     def __unicode__(self):
         return u"{}-{}-{}".format(self.name, self.started_at, self.ended_at)
+
+    def clone(self, name):
+        experiment = Experiment.objects.create(local_computer=self.local_computer,
+                                               name=name)
+        groups = self.group.all()
+        experiment.group.add(*groups)
+        for signal in self.signal_set.all():
+            sig = Signal.objects.create(local_computer=self.local_computer,
+                                  experiment=experiment,
+                                  name=signal.name,
+                                  system=signal.system)
+            sig.group.add(*groups)
+        for setting in self.setting_set.all():
+            set = Setting.objects.create(local_computer=self.local_computer,
+                                  experiment=experiment,
+                                  key=setting.key,
+                                  value=setting.value)
+            set.group.add(*groups)
+        for blob in self.blob_set.all():
+            blb = Blob.objects.create(local_computer=self.local_computer,
+                                  experiment=experiment,
+                                  name=blob.name,
+                                  system=blob.system,
+                                  mime_type=blob.mime_type)
+            blb.group.add(*groups)
+        return experiment
 
 @receiver(pre_save, sender=Command)
 @receiver(pre_save, sender=LocalComputer)
