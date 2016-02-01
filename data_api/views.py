@@ -1,11 +1,14 @@
 import json
+from django.core import serializers
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render, render_to_response
 
 # Create your views here.
 from django.template.context_processors import csrf
 from django.views.decorators.csrf import csrf_exempt
+import operator
 from requests import Response
 from data_api.models import Signal, Blob, LocalComputer, Experiment, Setting
 
@@ -115,3 +118,24 @@ def clone_experiment(request, local_computer_id, source_experiment_id):
             return HttpResponse({'status': "500 - HTTP GET not supported"}, status=500)
     except Exception as e:
         return HttpResponse({'status': "500 - unexpected error {} {}".format(e, e.message)}, status=500)
+
+EXPERIMENT = 'experiment'
+SIGNAL = 'signal'
+def find_signals(request, local_computer_id):
+
+    if EXPERIMENT in request.GET:
+        exp_s = request.GET[EXPERIMENT].strip().split(",")
+        exp_q = [Q(experiment__name__contains=token) for token in exp_s]
+    if SIGNAL in request.GET:
+        sig_s = request.GET[SIGNAL].strip().split(",")
+        sig_q = [Q(name__contains=token) for token in sig_s]
+    if EXPERIMENT in request.GET and SIGNAL in request.GET:
+        response_list = Signal.objects.filter(reduce(operator.or_, exp_q), reduce(operator.or_, sig_q))
+    elif EXPERIMENT in request.GET:
+        response_list = Signal.objects.filter(reduce(operator.or_, exp_q))
+    elif SIGNAL in request.GET:
+        response_list = Signal.objects.filter(reduce(operator.or_, sig_q))
+    else:
+        response_list = Signal.objects.all()
+
+    return HttpResponse(serializers.serialize('json', response_list), status=200)
