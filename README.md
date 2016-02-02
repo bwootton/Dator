@@ -157,7 +157,8 @@ A program resource tracks and optionally contains code to be loaded and run on t
 
 ---
 
-## <a name="resource_utilities></a>Resources Search and Clone utilities
+
+## <a name="resource_utilities"></a>Resources Search and Clone utilities
 These resource urls allow the user to find signals and clone experiments within a local_computer resource.
 
 ---
@@ -190,7 +191,7 @@ The search will return a json list of objects e.g.
 
 ---
 
-### /api/v1/local_computer/\<local_computer_id>\/experiment/\<experiment_id>\/clone_experiment/
+### /api/v1/local_computer/\<local_computer_id>\/experiment/\<experiment_id\>/clone_experiment/
 POST to this URL will create a new experiment with copied signals, blobs and settings from the given experiment
 
 #### URL parameters
@@ -205,7 +206,7 @@ experiment called "new_experiment".
 
 The post will return status 200 if it succeeds as well as json object with the id of the newly created experiment. e.g.
  
-```{id: 122'}```
+```{'id': '122'}```
 
 ---
 
