@@ -165,15 +165,18 @@ class Signal(SystemModel):
 
     def get_data(self):
         settings.SIGNAL_PROVIDER.startup()
-        data = settings.SIGNAL_PROVIDER.get_blob(self.uuid)
+        try:
+            data = settings.SIGNAL_PROVIDER.get_blob(self.uuid)
 
-        tokens = data.split("]")
-        points = []
-        for token in tokens:
-            if token != '':
-                ts = token[1:].split(",")
-                points+=[[float(t) for t in ts]]
-        return points
+            tokens = data.split("]")
+            points = []
+            for token in tokens:
+                if token != '':
+                    ts = token[1:].split(",")
+                    points+=[[float(t) for t in ts]]
+            return points
+        except:
+            return []
 
     @classmethod
     def millisec_to_utc(cls, millisec):

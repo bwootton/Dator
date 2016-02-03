@@ -163,7 +163,7 @@ These resource urls allow the user to find signals and clone experiments within 
 
 ---
 
-### /api/v1/local_computer/\<local_computer_id\>/find_signals
+### /data_api/v1/local_computer/\<local_computer_id\>/find_signals/
 GET signals objects based on matching experiments and strings.
 
 #### URL parameters
@@ -172,7 +172,7 @@ GET signals objects based on matching experiments and strings.
 
 #### Example
 
-__GET http://\<server\>/api/v1/local_computer/1/find_signals?experiment="exp1,exp2",signal="MDot,Z"__
+__GET http://\<server\>/api/v1/local_computer/1/find_signals?experiment=exp1,exp2&signal=MDot,Z&include_data__
 
 Will get all signals from local_computer with id 1 from experiments with names containing 'exp1' or 'exp2' and with 
 signal names containing either 'MDot' or 'Z'
@@ -182,9 +182,30 @@ The search will return a json list of objects e.g.
 ```
 [
     {
-        'signal_name': 'exp1',
-        'id': 254,
-        'experiment_name': 'exp1_10_14',
+        signal_name: 'exp1',
+        pk: 254,
+        
+        fields: {
+            group: [ ],
+            name: "test_signal_saw_1",
+            local_computer: 2,
+            created_at: "2015-09-18T16:33:09Z",
+            system: null,
+            updated_at: "2015-09-18T16:33:09Z",
+            experiment: null,
+            uuid: "1271fab9-f3ce-44d9-b3d8-5f9f5409bd40"
+        },
+        model: "data_api.signal",
+        data:[
+            [
+                -11,
+                1441260334.53325
+            ],
+            [
+                -22,
+                1441260336.70355
+            ]
+        ],
     }
 ]
 ```
