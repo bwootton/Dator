@@ -169,6 +169,7 @@ GET signals objects based on matching experiments and strings.
 #### URL parameters
 * __experiment__ A comma-separated list of strings to match experiment names
 * __signal__ A comma-separated list of string to match signal names
+* __include_data__ Include data from signals if this parameter is included in the URL.
 
 #### Example
 
