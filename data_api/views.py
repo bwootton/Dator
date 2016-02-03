@@ -113,7 +113,7 @@ def clone_experiment(request, local_computer_id, source_experiment_id):
                 return HttpResponse({'status': "500 - HTTP GET not supported"}, status=500)
             else:
                 experiment = source_experiment.clone(request.POST['name'])
-            return HttpResponse({'id': experiment.id}, status=200)
+            return HttpResponse({'id': experiment.id}, status=200, content_type="application/json")
         else:
             return HttpResponse({'status': "500 - HTTP GET not supported"}, status=500)
     except Exception as e:
@@ -121,6 +121,7 @@ def clone_experiment(request, local_computer_id, source_experiment_id):
 
 EXPERIMENT = 'experiment'
 SIGNAL = 'signal'
+INCLUDE_DATA = 'include_data'
 def find_signals(request, local_computer_id):
 
     if EXPERIMENT in request.GET:
@@ -138,4 +139,12 @@ def find_signals(request, local_computer_id):
     else:
         response_list = Signal.objects.all()
 
-    return HttpResponse(serializers.serialize('json', response_list), status=200)
+
+    if INCLUDE_DATA in request.GET:
+        response_map = dict((s.id, s) for s in response_list.all())
+        signals = json.loads(serializers.serialize('json', response_list))
+        for signal in signals:
+            signal['data'] = response_map[signal['pk']].get_data()
+        return HttpResponse(json.dumps(signals), status=200, content_type="application/json")
+    else:
+        return HttpResponse(serializers.serialize('json', response_list), status=200, content_type="application/json")

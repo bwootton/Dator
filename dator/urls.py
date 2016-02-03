@@ -27,12 +27,12 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/v1/local_computer/', include([
         url(r'^(?P<local_computer_id>\d+)/experiment/(?P<source_experiment_id>\d+)/clone_experiment/',
-            clone_experiment, name='CloneExperiment'),
-        url(r'^(?P<local_computer_id>\d+)/find_signals/', find_signals, name="FindSignals")
+            clone_experiment, name='CloneExperiment')
     ])),
     url(r'^api/', include(v1_api.urls)),
     url(r'^dator/', simple_view, name='SimpleURL'),
     url(r'^data_api/v1/', include([
+        url(r'^local_computer/(?P<local_computer_id>\d+)/find_signals/', find_signals, name="FindSignals"),
         url(r'^signal/(?P<signal_id>\d+)/', signal_data, name='SignalData'),
         url(r'^blob/(?P<blob_id>\d+)/', blob_data, name='BlobData')
     ])),

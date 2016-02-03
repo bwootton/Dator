@@ -9,7 +9,8 @@ import django.utils.timezone as tmz
 import pytz
 
 import delorean
-
+import dator
+from django.conf import settings
 
 class SystemModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -132,8 +133,8 @@ class MapPoint(SystemModel):
         return self.name
 
 
-SIGNAL_PROVIDER = file_provider
-BLOB_PROVIDER = file_provider
+
+
 
 class Signal(SystemModel):
     """
@@ -153,18 +154,18 @@ class Signal(SystemModel):
         :param frames [[<float value>,<float value2>, <time in millisec>],...]
         empty values must be formatted as nan
         """
-        SIGNAL_PROVIDER.startup()
+        settings.SIGNAL_PROVIDER.startup()
         string_frames = []
         for frame in frames:
             string_frames.append('['+ ','.join(["{:.15}".format(float(datum)) for datum in frame]) + ']')
 
-        SIGNAL_PROVIDER.append_data(self.uuid,
+        settings.SIGNAL_PROVIDER.append_data(self.uuid,
                                     ''.join([string_frame for string_frame in string_frames]))
 
 
     def get_data(self):
-        SIGNAL_PROVIDER.startup()
-        data = SIGNAL_PROVIDER.get_blob(self.uuid)
+        settings.SIGNAL_PROVIDER.startup()
+        data = settings.SIGNAL_PROVIDER.get_blob(self.uuid)
 
         tokens = data.split("]")
         points = []
@@ -187,8 +188,8 @@ class Signal(SystemModel):
         return pd.TimeSeries(values, index=dates)
 
     def clear(self):
-        SIGNAL_PROVIDER.startup()
-        SIGNAL_PROVIDER.clear(self.uuid)
+        settings.SIGNAL_PROVIDER.startup()
+        settings.SIGNAL_PROVIDER.clear(self.uuid)
 
 
 class Setting(SystemModel):
@@ -215,13 +216,13 @@ class Blob(SystemModel):
         return self.name
 
     def get_data(self):
-        BLOB_PROVIDER.startup()
-        data = BLOB_PROVIDER.get_blob(self.uuid)
+        settings.BLOB_PROVIDER.startup()
+        data = settings.BLOB_PROVIDER.get_blob(self.uuid)
         return data
 
     def set_data(self, json_data):
-        BLOB_PROVIDER.startup()
-        BLOB_PROVIDER.write_blob(self.uuid, json_data)
+        settings.BLOB_PROVIDER.startup()
+        settings.BLOB_PROVIDER.write_blob(self.uuid, json_data)
 
 class Experiment(SystemModel):
     group = models.ManyToManyField(Group)

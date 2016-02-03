@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 from data_api.models import System, Signal, LocalComputer, Blob, Experiment, Setting
 import django.utils.timezone as tmz
-from data_api.views import EXPERIMENT
+from data_api.views import EXPERIMENT, INCLUDE_DATA
 from data_api.views import SIGNAL
 
 
@@ -102,6 +102,24 @@ class TestViews(TestCase):
         response = self.client.get(reverse("FindSignals", args=(self.local_computer.id, )),
                                    data={EXPERIMENT: 'a,z'})
         self.assertEqual(len(json.loads(response.content)), 2)
+
+    def test_find_signals_with_data(self):
+        experiment = Experiment.objects.create(local_computer=self.local_computer, name='an_experiment')
+        signal = Signal.objects.create(local_computer=self.local_computer, name='a_signal', experiment=experiment)
+        n1 = Signal.utc_to_millisec(tmz.now())
+        n2 = Signal.utc_to_millisec(tmz.now() + tmz.timedelta(seconds=1))
+        signal.add_points([[1, n1], [2, n2]])
+
+        response = self.client.get(reverse('FindSignals', args=(self.local_computer.id,)),
+                                   data={INCLUDE_DATA:'true'})
+        signals = json.loads(response.content)
+        self.assertEqual(1, len(signals))
+        points = signals[0]['data']
+        self.assertEqual(2, len(points))
+        self.assertEqual(1,  points[0][0])
+        self.assertEqual(2, points[1][0])
+        self.assertAlmostEqual(n1, points[0][1], 2)
+        self.assertAlmostEqual(n2, points[1][1], 2)
 
     def test_claim_local_computer(self):
         # with a registration_token
