@@ -141,10 +141,13 @@ def find_signals(request, local_computer_id):
 
 
     if INCLUDE_DATA in request.GET:
-        response_map = dict((s.id, s) for s in response_list.all())
+        #response_map = dict((s.id, s) for s in response_list.all())
         signals = json.loads(serializers.serialize('json', response_list))
+        print("got signals loaded")
         for signal in signals:
-            signal['data'] = response_map[signal['pk']].get_data()
+            print("getting signal {}".format(str(signal['pk'])))
+            signal['data'] = Signal.objects.get(id=signal['pk']).get_data()
+        print "done with data"
         return HttpResponse(json.dumps(signals), status=200, content_type="application/json")
     else:
         return HttpResponse(serializers.serialize('json', response_list), status=200, content_type="application/json")
