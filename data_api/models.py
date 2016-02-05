@@ -12,6 +12,7 @@ import delorean
 import dator
 from django.conf import settings
 
+
 class SystemModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -19,6 +20,7 @@ class SystemModel(models.Model):
 
     class Meta:
         abstract = True
+
 
 class Event(SystemModel):
     """
@@ -34,6 +36,7 @@ class Event(SystemModel):
     def __unicode__(self):
         return "{}:{}".format(self.local_computer_id, self.type)
 
+
 class System(SystemModel):
     """
     A system is a group of related LocalComputers that  coordinate actions and signals with each other.
@@ -46,12 +49,14 @@ class System(SystemModel):
     def __unicode__(self):
         return self.name
 
+
 class Shift(SystemModel):
     """
     A Shift is used to record the beginning and the end of an experiment
     """
     name = models.CharField(max_length=128)
     ended_at = models.DateTimeField(null=True)
+
 
 class LocalComputer(SystemModel):
     """
@@ -92,11 +97,12 @@ class Command(SystemModel):
     def __unicode__(self):
         return "{}:{}:{}".format(self.local_computer_id, self.type, self.created_at)
 
+
 class Program(SystemModel):
     """
     A loadable script/code file that can be run on a local computer.
     A program will be run periodically with with a pause of the indicated
-    sleep_time between sucessive runs.
+    sleep_time between successive runs.
     """
     group = models.ManyToManyField(Group)
     code = models.TextField(null=True)
@@ -106,6 +112,7 @@ class Program(SystemModel):
 
     def __unicode__(self):
         return self.name
+
 
 class Map(SystemModel):
     """
@@ -121,6 +128,7 @@ class Map(SystemModel):
 ACTUATOR = 1
 SENSOR = 2
 
+
 class MapPoint(SystemModel):
 
     map = models.ForeignKey('Map')
@@ -131,9 +139,6 @@ class MapPoint(SystemModel):
 
     def __unicode__(self):
         return self.name
-
-
-
 
 
 class Signal(SystemModel):
@@ -161,7 +166,6 @@ class Signal(SystemModel):
 
         settings.SIGNAL_PROVIDER.append_data(self.uuid,
                                     ''.join([string_frame for string_frame in string_frames]))
-
 
     def get_data(self):
         settings.SIGNAL_PROVIDER.startup()
@@ -226,6 +230,7 @@ class Blob(SystemModel):
     def set_data(self, json_data):
         settings.BLOB_PROVIDER.startup()
         settings.BLOB_PROVIDER.write_blob(self.uuid, json_data)
+
 
 class Experiment(SystemModel):
     group = models.ManyToManyField(Group)

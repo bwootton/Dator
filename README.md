@@ -213,7 +213,7 @@ The search will return a json list of objects e.g.
 
 ---
 
-### /api/v1/local_computer/\<local_computer_id>\/experiment/\<experiment_id\>/clone_experiment/
+### /api/v1/local_computer/\<local_computer_id\ >/experiment/\<experiment_id\>/clone_experiment/
 POST to this URL will create a new experiment with copied signals, blobs and settings from the given experiment
 
 #### URL parameters
@@ -241,8 +241,8 @@ POSTing data to blob and signal endpoints update the data in the related objects
 
 POST data points to the signal to **append**.  Data should be JSON data in the body of the post and the content_type of the POST should be "application/json".  The format of the data  is [[<value1>, <seconds1>], [<value2>],[<seconds2>],...] 
 where value is a floating point number and seconds is floating point seconds since the epoch (Jan 1, 1970).  The data should be sorted in time-increasing order.
-Data points are formatted as a JSON array of arrays: [ <data frame1>, <data frame2>, ... , <data frameN] where data frame are arrays of floats 
-where the last float is presumed to be a UTC timestamp (sec since the epoch): [<value1>, <value2>, ..., <valueN>,<timestamp>].  
+Data points are formatted as a JSON array of arrays: [ \<data frame1\>, \<data frame2\>, ... , \<data frameN\>] where data frame are arrays of floats 
+where the last float is presumed to be a UTC timestamp (sec since the epoch): [\<value1\>, \<value2\>, ..., \<valueN\>,\<timestamp\>].  
 It is presumed that all data frames have the same number of values.  When storing a data frame where one of the values is empty, the
 value should be represented as 'nan'.
 
