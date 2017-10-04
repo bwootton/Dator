@@ -279,6 +279,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
     };
 
     $scope.displaySignal = function(signalId){
+<<<<<<< HEAD
         window.open("/dator/#/signal_graph/" + $routeParams.id + "/" + signalId, '_blank');
     };
 
@@ -311,3 +312,12 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
 
 angular.module('Ruenoor').controller('LocalComputer',
     ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', 'UserStateService', LocalComputer]);
+=======
+        $location.path("/signal_graph/" + $routeParams.id + "/" + signalId);
+    };
+
+}
+
+angular.module('Ruenoor').controller('LocalComputer',
+    ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', 'UserStateService', LocalComputer]);
+>>>>>>> 9e48beab291adb0e988b4fe1bc2cd3a1114dc59f

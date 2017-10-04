@@ -191,3 +191,6 @@ LOGGING = {
         },
     },
 }
+=======
+    BLOB_PROVIDER = file_provider
+>>>>>>> 9e48beab291adb0e988b4fe1bc2cd3a1114dc59f

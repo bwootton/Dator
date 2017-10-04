@@ -34,9 +34,13 @@ urlpatterns = [
     url(r'^data_api/v1/', include([
         url(r'^local_computer/(?P<local_computer_id>\d+)/find_signals/', find_signals, name="FindSignals"),
         url(r'^signal/(?P<signal_id>\d+)/', signal_data, name='SignalData'),
+<<<<<<< HEAD
         url(r'^blob/(?P<blob_id>\d+)/', blob_data, name='BlobData'),
         url(r'^experiment_media/(?P<experiment_id>\d+)/', experiment_media, name='ExperimentMedia'),
         url(r'^setting/(?P<setting_id>\d+)/', setting_data, name='SettingData'),
+=======
+        url(r'^blob/(?P<blob_id>\d+)/', blob_data, name='BlobData')
+>>>>>>> 9e48beab291adb0e988b4fe1bc2cd3a1114dc59f
     ])),
     url(r'^claim_local_computer/(?P<local_computer_id>\d+)/', claim_local_computer, name='ClaimLocalComputer'),
     url(r'^noop/', noop_view, name='NoopView'),
