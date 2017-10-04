@@ -61,7 +61,6 @@ function SignalGraph($scope, $routeParams, Restangular, $http, $timeout) {
     }
 
     $scope._loadData($routeParams.signal_id);
->>>>>>> 9e48beab291adb0e988b4fe1bc2cd3a1114dc59f
 
 }
 

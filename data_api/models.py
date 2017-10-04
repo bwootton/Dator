@@ -162,10 +162,6 @@ class Signal(SystemModel):
         settings.SIGNAL_PROVIDER.append_data(self.uuid,
                                     ''.join([string_frame for string_frame in string_frames]))
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 9e48beab291adb0e988b4fe1bc2cd3a1114dc59f
     def get_data(self):
         settings.SIGNAL_PROVIDER.startup()
         try:
