@@ -94,8 +94,6 @@ else:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dator',
-	'USER': 'root',
 	'PASSWORD': 'dator',
 	'HOST': '',
         'PORT': '',
