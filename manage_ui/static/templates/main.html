@@ -11,7 +11,7 @@
                         <tr>
                             <th>Name</th>
                             <th>UUID</th>
-                            <th>Delete</th>
+                        <!--    <th>Delete</th> -->
                         </tr>
                         </thead>
                         <tbody>
@@ -22,22 +22,27 @@
                             <td>
                                 <a href="/dator/#/local_computer/{{ localComputer.id }}">{{ localComputer.uuid }}</a>
                             </td>
+                            <!--
                             <td>
                                 <button class="pull-right" ng-click="deleteComputer(localComputer.id)"><b>x</b></button>
                             </td>
+                            -->
                         </tr>
 
                         </tbody>
                     </table>
                 </div>
-
+                
+                <!--
                 <div class="panel-default">
                     <div class="panel-body">
                         <button class="btn btn-default" ng-click="claimComputer()">Claim Computer</button>
                     </div>
                 </div>
+                -->
             </div>
         </div>
+        <!--
         <div class="panel-default">
             <div class="panel panel-default">
                 <div class="panel-heading">
@@ -71,6 +76,6 @@
                 </div>
             </div>
         </div>
-
+        -->
     </div>
 </div>

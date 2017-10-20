@@ -213,7 +213,7 @@ The search will return a json list of objects e.g.
 
 ---
 
-### /api/v1/local_computer/\<local_computer_id\ >/experiment/\<experiment_id\>/clone_experiment/
+### /api/v1/local_computer/\<local_computer_id>\/experiment/\<experiment_id\>/clone_experiment/
 POST to this URL will create a new experiment with copied signals, blobs and settings from the given experiment
 
 #### URL parameters

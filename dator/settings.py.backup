@@ -29,12 +29,7 @@ SECRET_KEY = 'ls7ecz$!=*695-m5f91(nr353^@(g@y!uatfjn49v_d0ea8(z2'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
-
-API_LIMIT_PER_PAGE = 100
-
-STATIC_ROOT='/home/ubuntu/static'
-
+ALLOWED_HOSTS = []
 
 # always return JSON for model objects
 TASTYPIE_DEFAULT_FORMATS = ['json']
@@ -93,15 +88,8 @@ else:
     db_name = os.path.join(BASE_DIR, 'db.sqlite3')
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'dator',
-	'USER': 'root',
-	'PASSWORD': 'dator',
-	'HOST': '',
-        'PORT': '',
-	'OPTIONS': {"init_command": "SET SESSION TRANSACTION ISOLATION LEVEL READ COMMITTED", } 
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': db_name,
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': db_name,
     }
 }
 
@@ -132,62 +120,3 @@ if TEST:
 else:
     SIGNAL_PROVIDER = file_provider
     BLOB_PROVIDER = file_provider
-
-
-
-# settings.py
-"""
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format' : "[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s",
-            'datefmt' : "%d/%b/%Y %H:%M:%S"
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': 'mysite.log',
-            'formatter': 'verbose'
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers':['file'],
-            'propagate': True,
-            'level':'DEBUG',
-        },
-        'data_api': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-        },
-    }
-}
-"""
-
-
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'file': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': '/home/ubuntu/barc/Dator/debug.log',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['file'],
-            'level': 'DEBUG',
-            'propagate': True,
-        },
-    },
-}

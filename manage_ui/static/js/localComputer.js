@@ -20,12 +20,12 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
             experiment: ALL_EXPERIMENTS
         });
 
-    $scope.experimentChoices= [ALL_EXPERIMENTS];
+
     /**
      *
      * Sets experiments from the db.
      */
-    $scope.getExperiments=function(){
+    $scope.getExperiments = function(){
         return Restangular.all("experiment").getList({format:'json', local_computer_id: $scope.localComputer.id}).
             then(function (data){
                 $scope.experiments = data;
@@ -33,14 +33,19 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
         });
     };
 
+    $scope.experimentChoices= [ALL_EXPERIMENTS];
+
     /**
      * Populate experiment choices from $scope.experiments
      */
     $scope.setExperimentChoices=function() {
         $scope.experimentChoices = [ALL_EXPERIMENTS];
-        $scope.experimentChoices.push({'id':1,'name':'rue'});
         _.each($scope.experiments, function(experiment){
-            $scope.experimentChoices.push({'id':experiment.id, 'name':experiment.name});
+            console.log(experiment);
+
+            $scope.experimentChoices.push({'id':experiment.id, 'name':experiment.name,
+                                          'media_link': experiment.media_link});
+
         });
     };
 
@@ -71,6 +76,7 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
             $scope.getSettings();
             $scope.getEvents();
             $scope.getBlobs();
+            $scope.getExperiments();
         }, function (reason) {
             alert("Couldn't load localComputer: " + reason);
         });
@@ -142,6 +148,59 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
             alert("Couldn't stop program on local computer: " + reason);
         });
     };
+
+
+    $scope.filterExperiment = function() {
+
+        var experiment_id = $scope.uiState.experiment.id;
+
+        var arguments = {format:'json', local_computer_id: $scope.localComputer.id};
+
+        if ($scope.uiState.experiment.id != 0) {
+            arguments.experiment_id = $scope.uiState.experiment.id;
+        }
+
+        $scope.signals = Restangular.all("signal").getList(arguments).
+            then(function (data){
+                $scope.signals = data;
+                $scope.uiState.signalsCount=data.length;
+            });
+
+        $scope.uiState.signalsCount = $scope.signals.length;
+
+        $scope.settings = Restangular.all("setting").getList(arguments).
+            then(function (data){
+                $scope.settings = data;
+                $scope.uiState.settingsCount = data.length;
+
+                for (var i = 0; i < data.length; ++i) {
+
+                    if (data[i].key == "video") {
+                        $scope.uiState.experiment.media_link = data[i].value;
+                    }
+                }
+            });
+    }
+
+
+    $scope.deleteExperiment = function() {
+        if ($scope.uiState.experiment.id == 0) {
+            alert("Please delete individual experiment");
+            return;
+        }
+
+        console.log($scope.uiState.experiment);
+
+        Restangular.one("experiment").get({format:'json', name: $scope.uiState.experiment.name}).
+            then(function(experiment) {
+                // console.log(experiment.objects[0].name);
+                experiment.remove({name: experiment.objects[0].name}).then(function(removeStatus) {
+                    $scope.uiState.experiment.id = 0;
+                    $scope.filterExperiment();
+                    $scope.experiments = $scope.getExperiments();
+                });
+            });
+    }
 
     /**
      * Get a list of signals associated with the computer.
@@ -220,10 +279,35 @@ function LocalComputer($scope, $routeParams, $interval, Restangular, $location, 
     };
 
     $scope.displaySignal = function(signalId){
-        $location.path("/signal_graph/" + $routeParams.id + "/" + signalId);
+        window.open("/dator/#/signal_graph/" + $routeParams.id + "/" + signalId, '_blank');
     };
 
+    $scope.save_media_link = function() {
+        console.log($scope.uiState.experiment.id);
+        console.log($('#media-link').val());
+
+        $.ajax({
+            url: '/data_api/v1/experiment_media/' + $scope.uiState.experiment.id + '/',
+            type : 'POST',
+
+            data : JSON.stringify({
+                'media' : $('#media-link').val()
+            }),
+
+            success : function(json) {
+                console.log(json);
+            },
+
+            // handle a non-successful response
+            error : function(xhr,errmsg,err) {
+                console.log(xhr.status + ": " + xhr.responseText); // provide a bit more info about the error to the console
+            }
+        })
+
+        location.reload();
+    }
 }
+
 
 angular.module('Ruenoor').controller('LocalComputer',
     ['$scope', '$routeParams', '$interval', 'Restangular',  '$location', 'UserStateService', LocalComputer]);

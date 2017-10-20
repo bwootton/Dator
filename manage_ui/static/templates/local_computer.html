@@ -108,22 +108,60 @@
                         </div>
                     </div>
                 </div>
-
             </div>
             <div class="panel panel-default dator-inner-panel">
                 <div class="panel-heading">
                     <div class="panel-title">
                         Data
                         <div class="form-group pull-right">
-                        <label class="small dator-spaced-title">Experiment</label>
+                            <!-- <a href="{{ uiState.experiment.experiment_link }}"/> -->
+                        <label class="small dator-spaced-title">Media</label>
+<<<<<<< HEAD
+=======
+                        <a type="button" class="btn btn-link" role="link" name="op" value="{{ uiState.experiment.media_link }}"
+                           href="{{ uiState.experiment.media_link }}"><p style="overflow:hidden;text-overflow:ellipsis;max-width:200px">{{ uiState.experiment.media_link }}</p></a>
+>>>>>>> bdec368cb740cf7c634bb87fad5e246c2ebaeb91
 
+
+
+                        <a type="button" class="btn btn-link" role="link" name="op" value="{{ uiState.experiment.media_link }}"
+                           href="{{ uiState.experiment.media_link }}"><p style="overflow:hidden;text-overflow:ellipsis;max-width:200px">{{ uiState.experiment.media_link }}</p></a>
+
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                        <h4 class="modal-title" id="myModalLabel">Update media link</h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form>
+                                            <div class="form-group">
+                                                <label for="media-link" class="form-control-label">Media link:</label>
+                                                <input type="text" class="form-control" id="media-link">
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <button class="btn btn-primary" id="save-media" ng-click="save_media_link()" data-dismiss="modal">Save Changes</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <label class="small dator-spaced-title">Experiment</label>
                         <select name="experiment"
                                 ng-model="uiState.experiment"
                                 ng-options="experiment.name for experiment in experimentChoices track by experiment.id"
-                                class="dator-spaced-title"></select>
-                            <button ng-click="newProgram()">
-                            <i class="fa fa-plus" style="color: black; background-color: transparent;"></i>
-                        </button>
+                                ng-change="filterExperiment()"
+                                class="dator-spaced-title"
+                                style="color: black;"></select>
                         </div>
                     </div>
 
@@ -154,6 +192,7 @@
                                             <th>UUID</th>
                                             <th class="text-center">Display graph</th>
                                             <th class="text-center">Get JSON</th>
+                                            <th class="text-center">Get CSV</th>
                                         </tr>
                                         </thead>
                                         <tbody>
@@ -171,6 +210,13 @@
                                                     <i class="fa fa-download" style="color: greenyellow; background-color: transparent;"> </i>
                                                 </a>
                                             </td>
+
+                                            <td class="text-center">
+                                                <a href="/data_api/v1/signal/{{ signal.id }}/?format=csv" style="background-color: transparent; color: transparent;">
+                                                    <i class="fa fa-download" style="color: greenyellow; background-color: transparent;"> </i>
+                                                </a>
+                                            </td>
+
                                         </tr>
                                         </tbody>
                                     </table>

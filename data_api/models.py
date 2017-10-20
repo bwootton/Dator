@@ -12,15 +12,13 @@ import delorean
 import dator
 from django.conf import settings
 
-
 class SystemModel(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True, null=True)
     uuid = models.CharField(max_length=128, db_index=True)
 
     class Meta:
         abstract = True
-
 
 class Event(SystemModel):
     """
@@ -36,7 +34,6 @@ class Event(SystemModel):
     def __unicode__(self):
         return "{}:{}".format(self.local_computer_id, self.type)
 
-
 class System(SystemModel):
     """
     A system is a group of related LocalComputers that  coordinate actions and signals with each other.
@@ -49,14 +46,12 @@ class System(SystemModel):
     def __unicode__(self):
         return self.name
 
-
 class Shift(SystemModel):
     """
     A Shift is used to record the beginning and the end of an experiment
     """
     name = models.CharField(max_length=128)
     ended_at = models.DateTimeField(null=True)
-
 
 class LocalComputer(SystemModel):
     """
@@ -97,12 +92,11 @@ class Command(SystemModel):
     def __unicode__(self):
         return "{}:{}:{}".format(self.local_computer_id, self.type, self.created_at)
 
-
 class Program(SystemModel):
     """
     A loadable script/code file that can be run on a local computer.
     A program will be run periodically with with a pause of the indicated
-    sleep_time between successive runs.
+    sleep_time between sucessive runs.
     """
     group = models.ManyToManyField(Group)
     code = models.TextField(null=True)
@@ -112,7 +106,6 @@ class Program(SystemModel):
 
     def __unicode__(self):
         return self.name
-
 
 class Map(SystemModel):
     """
@@ -128,7 +121,6 @@ class Map(SystemModel):
 ACTUATOR = 1
 SENSOR = 2
 
-
 class MapPoint(SystemModel):
 
     map = models.ForeignKey('Map')
@@ -139,6 +131,9 @@ class MapPoint(SystemModel):
 
     def __unicode__(self):
         return self.name
+
+
+
 
 
 class Signal(SystemModel):
@@ -188,7 +183,11 @@ class Signal(SystemModel):
 
     @classmethod
     def utc_to_millisec(cls, dt):
-        return delorean.Delorean(dt, timezone="UTC").epoch()
+        epoch = delorean.Delorean(dt, timezone="UTC").epoch
+        if not hasattr(epoch, '__call__'):
+            return delorean.Delorean(dt, timezone="UTC").epoch
+        else:
+            return delorean.Delorean(dt, timezone="UTC").epoch()
 
     def get_time_series(self):
         values, dates = self.get_data()
@@ -231,7 +230,6 @@ class Blob(SystemModel):
         settings.BLOB_PROVIDER.startup()
         settings.BLOB_PROVIDER.write_blob(self.uuid, json_data)
 
-
 class Experiment(SystemModel):
     group = models.ManyToManyField(Group)
     started_at = models.DateTimeField(null=True)
@@ -267,6 +265,13 @@ class Experiment(SystemModel):
                                   mime_type=blob.mime_type)
             blb.group.add(*groups)
         return experiment
+
+
+class LocalSignalTag(models.Model):
+    signal = models.ForeignKey('Signal')
+    uploaded = models.BooleanField(default=False)
+
+
 
 @receiver(pre_save, sender=Command)
 @receiver(pre_save, sender=LocalComputer)

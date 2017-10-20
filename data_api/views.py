@@ -1,4 +1,7 @@
+import csv
 import json
+import StringIO
+
 from django.core import serializers
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -17,6 +20,31 @@ def noop_view(request):
     c={}
     c.update(csrf(request))
     return render_to_response('noop.html', c)
+
+
+@csrf_exempt
+def setting_data(request, setting_id):
+    try:
+        setting = Setting.objects.get(id=setting_id)
+    except Setting.DoesNotExist as e:
+        return HttpResponse({'status: failed - Setting requested does not exist.'}, status=404)
+
+    if request.method=='POST':
+        try:
+            json_dict = json.loads(request.body)
+            setting.value = json_dict['value']
+            setting.save()
+            response_dict={'status': 'succeeded'}
+            return HttpResponse(json.dumps(response_dict), status=200, content_type='application/json')
+        except BaseException as e:
+            return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
+    elif request.method == 'GET':
+        try:
+            body = setting.value
+            return HttpResponse(body, status=200, content_type="application/json")
+        except BaseException as e:
+            return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
+
 
 @csrf_exempt
 def blob_data(request, blob_id):
@@ -62,6 +90,7 @@ def signal_data(request, signal_id):
     """
     try:
         signal = Signal.objects.get(id=signal_id)
+        print signal
     except Signal.DoesNotExist as e:
         return HttpResponse({'status': 'failed - Signal requested does not exist'}, status=404)
 
@@ -76,10 +105,43 @@ def signal_data(request, signal_id):
 
     elif request.method == 'GET':
         try:
-            body = json.dumps(signal.get_data())
-            return HttpResponse(body, status=200, content_type="application/json")
+            content_type = 'application/json'
+            if 'format' in request.GET and request.GET['format'] == 'csv':
+                content_type = 'text/csv'
+                raw_data = StringIO.StringIO()
+
+                data = signal.get_data()
+                print data
+                writer = csv.writer(raw_data)
+                for dat in data:
+                    writer.writerow(dat)
+
+                body = raw_data.getvalue()
+            else:
+                body = json.dumps(signal.get_data())
+            return HttpResponse(body, status=200, content_type=content_type)
         except BaseException as e:
             return HttpResponse({'status': 'failed {}'.format(e)}, status=500)
+
+
+@csrf_exempt
+def experiment_media(request, experiment_id):
+    try:
+        experiment = Experiment.objects.get(id=experiment_id)
+    except Experiment.DoesNotExist as e:
+        return HttpResponse({'status': 'failed - Experiment requested does not exist'}, status=404)
+
+    if request.method == 'POST':
+        try:
+            data = json.loads(request.body)
+            media_link = data['media']
+            experiment.media_link = media_link
+            experiment.save()
+            response_dict = {'status': 'succeeded'}
+            return HttpResponse(response_dict, status=200, content_type="application/json")
+        except BaseException as e:
+            return HttpResponse({'status': 'failed{}'.format(e)}, status=500)
+
 
 def claim_local_computer(request, local_computer_id):
     """
