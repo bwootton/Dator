@@ -7,7 +7,7 @@ cffi==1.4.2
 Cheetah==2.4.4
 colorama==0.3.3
 configobj==4.7.2
-cryptography==1.2.1
+cryptography==3.2
 cv-bridge==1.11.8
 Delorean==0.6.0
 Django==1.8.1
