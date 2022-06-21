@@ -40,7 +40,7 @@ lockfile==0.10.2
 Markdown==2.6.5
 message-filters==1.11.16
 ndg-httpsclient==0.4.0
-numpy==1.10.4
+numpy==1.22.0
 oauth==1.0.1
 pandas==0.16.1
 pluginlib==1.10.1
