@@ -22,7 +22,7 @@ genlisp==0.4.15
 genmsg==0.5.6
 genpy==0.5.7
 gnureadline==6.3.3
-html5lib==0.999
+html5lib==0.999999999
 httplib2==0.8
 humanize==0.5.1
 idna==2.0
