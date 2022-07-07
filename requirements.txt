@@ -60,7 +60,7 @@ qt-dotgraph==0.2.29
 qt-gui==0.2.29
 qt-gui-cpp==0.2.29
 qt-gui-py-common==0.2.29
-requests==2.2.1
+requests==2.20.0
 rosbag==1.11.16
 rosboost-cfg==1.11.11
 rosclean==1.11.11
